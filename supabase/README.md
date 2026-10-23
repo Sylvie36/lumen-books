@@ -8,7 +8,7 @@
 | 阶段 | 内容 | 状态 |
 |---|---|---|
 | Phase 0 | 基础设施：.gitignore / env 模板 / vendor 离线副本 / client.js / 本文档 | 本次完成 |
-| Phase 1 | categories + books 建表、只读 RLS、幂等 seed、db-test.html 验证 | 待确认后执行 |
+| Phase 1 | categories + books 建表、只读 RLS、幂等 seed、db-test.html 验证 | 文件已建（schema.sql/seed.mjs/api.js/db-test.html），待云端执行与验证 |
 | Phase 2 | listings 在售数据 + public_profiles 视图 | 未开始 |
 | Phase 3 | Supabase Auth + auth-bridge + 收藏/购物车/地址 | 未开始 |
 | Phase 4 | orders/order_items + create_order RPC + checkout 接入 | 未开始 |
