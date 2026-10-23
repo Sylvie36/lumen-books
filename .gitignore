@@ -18,5 +18,8 @@ supabase/env.js
 Thumbs.db
 desktop.ini
 
+# ---- Python 调试脚本缓存（基线已跟踪的旧文件保留，新增忽略）----
+__pycache__/
+
 # ---- 后续若引入 Node 工具链 ----
 node_modules/
