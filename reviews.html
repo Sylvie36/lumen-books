@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>书话 · LUMEN BOOKS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="common.css">
+<style>
+/* ============================================================
+   reviews.html 页内样式
+   ------------------------------------------------------------
+   设计 token / 基础排版 / 页头 / 按钮 / 页脚 → common.css
+   皮肤（照片背景 + 玻璃拟态 + 柔雾配色）  → theme-mist.css
+   本文件只保留「本页专有」的样式，避免与全站重复定义。
+   ============================================================ */
+button{font-family:inherit;cursor:pointer;}
+input,textarea,select{font-family:inherit;}
+
+/* 页内小按钮：common.css 未定义 .btn-mini，本页需要，保留 */
+.btn-mini{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12.5px;font-weight:600;
+  padding:8px 16px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--glass-strong);color:var(--text-dim);
+  transition:.25s;white-space:nowrap;
+}
+.btn-mini:hover{border-color:var(--text);color:var(--text);}
+.btn-mini.primary{background:var(--text);color:#fff;border-color:var(--text);}
+.btn-mini.primary:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* Page head */
+.page-head{padding:16px 0 8px;}
+.page-head-inner{padding:40px 44px;}
+.breadcrumb{
+  font-size:12.5px;color:var(--text-faint);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;
+}
+.breadcrumb a{transition:.25s;}
+.breadcrumb a:hover{color:var(--accent);}
+.breadcrumb .sep{opacity:.5;}
+.page-title{
+  font-size:clamp(28px,3.4vw,44px);font-weight:800;
+  margin:0 0 12px;letter-spacing:-0.02em;color:var(--text);line-height:1.1;
+}
+.page-sub{color:var(--text-dim);margin:0;font-size:15px;max-width:680px;line-height:1.75;}
+.page-sub b{color:var(--text);font-weight:600;}
+
+/* ============================================================
+   求书 · 发布入口（矩形按钮，位于书话标题下方）
+   ============================================================ */
+.wanted-fab{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:20px;
+  padding:12px 28px;
+  border-radius:12px;
+  border:none;
+  background:var(--color-primary);color:#fff;
+  font-size:14.5px;font-weight:600;
+  box-shadow:0 10px 24px -12px rgba(36,39,34,.35);
+  transition:transform .25s cubic-bezier(.2,.75,.3,1),background .25s,box-shadow .25s;
+  cursor:pointer;
+}
+.wanted-fab:hover{
+  background:var(--color-primary-hover);
+  transform:translateY(-2px);
+  box-shadow:0 16px 30px -14px rgba(36,39,34,.45);
+}
+.wanted-fab:active{transform:translateY(0);}
+
+/* ============================================================
+   书评卡片 —— 观点优先
+   ============================================================ */
+.review-grid{
+  display:flex;flex-direction:column;gap:20px;
+  padding:16px 0 32px;
+}
+
+.review-card{
+  position:relative;
+  background:var(--surface);
+  border-radius:var(--radius);
+  padding:32px 40px 28px;
+  box-shadow:0 1px 0 rgba(255,255,255,.4) inset, 0 20px 50px -24px rgba(0,0,0,.1);
+  transition:transform .35s cubic-bezier(.2,.75,.3,1),box-shadow .35s;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.review-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.16);
+}
+
+/* 作者行：头像 + 名字 + 时间 */
+.review-card .rv-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:22px;
+}
+
+.review-card .avatar{
+  width:40px;height:40px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--book-bg,#111);color:#fff;
+  font-size:15px;font-weight:700;
+}
+
+.review-card .rv-user{
+  display:flex;flex-direction:column;line-height:1.4;min-width:0;
+}
+.review-card .rv-user strong{font-size:14.5px;font-weight:700;}
+.review-card .rv-user span{font-size:12.5px;color:var(--text-faint);}
+
+.review-card .rv-time{
+  margin-left:auto;
+  font-size:12px;
+  color:var(--text-faint);
+  white-space:nowrap;
+}
+
+/* 观点标题：正文的主体 */
+.review-card .rv-title{
+  font-size:20px;
+  font-weight:800;
+  line-height:1.45;
+  letter-spacing:-0.01em;
+  color:var(--text);
+  margin:0 0 14px;
+  transition:color .25s;
+}
+.review-card:hover .rv-title{color:var(--accent);}
+
+/* 观点正文：3 行截断 */
+.review-card .rv-text{
+  font-size:14.5px;
+  color:var(--text-dim);
+  line-height:1.85;
+  margin:0 0 20px;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* 书籍内联链接：小、安静、不抢观点 */
+.review-card .rv-book-inline{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 14px 6px 8px;
+  border-radius:999px;
+  background:var(--glass-soft);
+  border:1px solid var(--line);
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-dim);
+  margin-bottom:22px;
+  transition:.25s;
+  text-decoration:none;
+}
+.review-card .rv-book-inline:hover{
+  background:var(--accent-bg);
+  border-color:rgba(201,113,76,.26);
+  color:var(--accent);
+}
+.review-card .rv-book-inline .mini-cover{
+  width:22px;
+  aspect-ratio:3/4.2;
+  border-radius:3px;
+  background:var(--book-bg,#111);
+  border:1px solid rgba(255,255,255,.18);
+  flex:none;
+}
+.review-card .rv-book-inline .rv-book-arrow{
+  font-size:12px;
+  opacity:.6;
+}
+
+/* 互动栏 */
+.review-card .rv-foot{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+  font-size:13px;
+  color:var(--text-faint);
+}
+.review-card .rv-foot .rv-likes{
+  color:var(--accent);
+  font-weight:700;
+}
+.review-card .rv-foot .rv-replies{
+  color:var(--text-dim);
+  font-weight:600;
+}
+.review-card .rv-foot .rv-stars{
+  margin-left:auto;
+  color:var(--accent);
+  letter-spacing:.12em;
+  font-size:12px;
+}
+
+/* ============================================================
+   书评详情
+   ============================================================ */
+.detail-wrap{
+  display:grid;grid-template-columns:1fr 320px;gap:24px;
+  padding:16px 0 32px;align-items:start;
+}
+.article-card{padding:44px 48px;}
+.article-head{
+  display:flex;align-items:center;gap:14px;margin-bottom:26px;
+  padding-bottom:22px;border-bottom:1px solid var(--line);
+}
+.article-head .avatar{
+  width:52px;height:52px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--book-bg,#111);color:#fff;
+  font-size:19px;font-weight:700;
+}
+.article-head .who{flex:1;min-width:0;}
+.article-head .who strong{
+  font-size:15px;font-weight:700;display:block;margin-bottom:3px;
+}
+.article-head .who span{font-size:12.5px;color:var(--text-faint);}
+.article-head .stars{
+  font-size:14px;letter-spacing:.14em;color:var(--accent);
+  font-weight:700;
+}
+.article-head .date{
+  font-size:12px;color:var(--text-faint);margin-top:4px;
+  display:block;
+}
+
+.article-book-tag{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px 8px 8px;border-radius:999px;
+  background:var(--glass-soft);border:1px solid var(--line);
+  font-size:13px;font-weight:600;color:var(--text-dim);
+  margin-bottom:22px;transition:.25s;
+}
+.article-book-tag:hover{background:var(--accent-bg);border-color:rgba(53,107,74,.40);color:var(--accent);}
+.article-book-tag .mini-cover{
+  width:26px;aspect-ratio:3/4.2;border-radius:3px;flex:none;
+  background:var(--book-bg,#111);
+  border:1px solid rgba(255,255,255,.18);
+}
+
+.article-title{
+  font-size:clamp(24px,2.8vw,34px);font-weight:800;
+  margin:0 0 22px;letter-spacing:-0.02em;line-height:1.25;color:var(--text);
+}
+.article-body{
+  font-size:16px;color:var(--text-dim);line-height:2;margin-bottom:26px;
+}
+.article-body p{margin:0 0 20px;}
+.article-body p:last-child{margin-bottom:0;}
+.article-body b{color:var(--text);font-weight:600;}
+.article-body blockquote{
+  margin:24px 0;padding:18px 22px;
+  border-left:3px solid var(--accent);
+  background:var(--glass-soft);border-radius:0 12px 12px 0;
+  font-size:15.5px;color:var(--text-dim);line-height:1.8;
+}
+
+.article-foot{
+  display:flex;align-items:center;gap:12px;
+  padding-top:24px;border-top:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.article-foot .stat{
+  font-size:13px;color:var(--text-faint);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.article-foot .stat b{color:var(--accent);font-weight:700;}
+.article-foot .actions{
+  margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;
+}
+
+/* 侧栏 */
+.side-card{padding:26px 24px;margin-bottom:20px;}
+.side-card h4{
+  font-size:14px;font-weight:800;margin:0 0 18px;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:8px;
+}
+.side-card h4::before{
+  content:'';width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;
+}
+.side-book{
+  display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);
+  transition:.25s;cursor:pointer;
+}
+.side-book:last-child{border-bottom:0;padding-bottom:0;}
+.side-book:first-of-type{padding-top:0;}
+.side-book:hover{padding-left:6px;}
+.side-book .cover-sm{
+  width:40px;aspect-ratio:3/4.2;border-radius:4px;flex:none;
+  background:var(--book-bg,#111);
+  border:1px solid rgba(255,255,255,.18);
+  position:relative;overflow:hidden;
+}
+.side-book .cover-sm::before{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(0,0,0,.25));
+}
+.side-book .info{flex:1;min-width:0;}
+.side-book .info h5{
+  font-size:13.5px;font-weight:700;margin:0 0 3px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.side-book .info p{
+  font-size:11.5px;color:var(--text-faint);margin:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.side-book .price{
+  font-size:14px;font-weight:800;color:var(--accent);
+  font-variant-numeric:tabular-nums;
+}
+.side-book .price small{font-size:11px;font-weight:700;margin-right:1px;}
+
+/* ============================================================
+   发布求书弹层
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.4);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(4px);
+}
+.overlay.show{display:flex;}
+.modal{
+  background:var(--surface);border-radius:var(--radius);
+  width:min(520px,100%);padding:40px 40px 32px;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.4);
+  max-height:90vh;overflow-y:auto;
+  animation:pop .35s cubic-bezier(.2,.75,.3,1);
+}
+@keyframes pop{
+  from{opacity:0;transform:translateY(20px) scale(.97);}
+  to{opacity:1;transform:none;}
+}
+.modal h3{font-size:22px;font-weight:800;margin:0 0 8px;letter-spacing:-0.01em;}
+.modal .sub{font-size:14px;color:var(--text-dim);margin:0 0 24px;line-height:1.7;}
+.modal .sub b{color:var(--text);font-weight:700;}
+
+.modal-fields{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;}
+.field label{
+  display:block;font-size:12px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text);margin-bottom:8px;
+}
+.field input,.field textarea{
+  width:100%;padding:13px 16px;border-radius:14px;
+  border:1.5px solid var(--line);background:var(--glass-soft);
+  font-size:14.5px;color:var(--text);outline:none;transition:.25s;
+  font-family:inherit;resize:vertical;
+}
+.field textarea{min-height:88px;line-height:1.7;}
+.field input:focus,.field textarea:focus{border-color:var(--accent);background:var(--glass-strong);}
+.field .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+.modal-actions{display:flex;gap:10px;}
+.modal-actions button{flex:1;justify-content:center;}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(20px);
+  background:var(--text);color:#fff;
+  font-size:13.5px;font-weight:600;
+  padding:13px 24px;border-radius:999px;
+  box-shadow:0 20px 40px -16px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:.35s;z-index:300;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Footer：common.css 的 .site-footer-wrap 只有 padding-bottom，
+   与 book.html / profile.html / sell.html 保持一致，本页补上顶部留白 */
+.site-footer-wrap{padding-bottom:32px;padding-top:32px;}
+
+/* Reveal */
+@media (prefers-reduced-motion:no-preference){
+  .reveal{
+    opacity:0;transform:translateY(20px);
+    transition:opacity .7s cubic-bezier(.2,.8,.3,1),transform .7s cubic-bezier(.2,.8,.3,1);
+  }
+  .reveal.in{opacity:1;transform:none;}
+}
+
+/* Responsive */
+@media (max-width:1080px){
+  .detail-wrap{grid-template-columns:1fr;}
+}
+@media (max-width:900px){
+  .article-card{padding:32px 28px;}
+
+  /* 书评卡片：收紧内边距与标题字号 */
+  .review-card{padding:26px 24px 22px;}
+  .review-card .rv-title{font-size:17px;}
+}
+@media (max-width:640px){
+  .page-head-inner{padding:28px 22px;}
+  .modal{padding:30px 24px 24px;}
+
+  .review-card{padding:22px 20px 18px;}
+  .review-card .rv-title{font-size:16px;}
+  .review-card .rv-foot{gap:16px;}
+}
+
+/* ============================================================
+   话题栏
+   ============================================================ */
+.topic-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:18px 22px;
+  margin-bottom:20px;
+  background:var(--glass-soft);
+  border:1px solid var(--glass-edge);
+  border-radius:var(--radius-sm);
+  backdrop-filter:blur(11px) saturate(1.04);
+  -webkit-backdrop-filter:blur(11px) saturate(1.04);
+}
+.topic-bar-label{
+  font-size:11.5px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-right:4px;
+}
+.topic-chip{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-dim);
+  padding:7px 16px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--glass-strong);
+  cursor:pointer;
+  transition:.25s;
+  white-space:nowrap;
+}
+.topic-chip:hover{
+  color:var(--accent);
+  border-color:var(--accent);
+}
+.topic-chip.active{
+  color:#fff;
+  background:var(--text);
+  border-color:var(--text);
+}
+</style>
+<link rel="stylesheet" href="nav-ball.css">
+<link rel="stylesheet" href="theme-mist.css">
+<!-- 方案 B · 一页之间：出版物皮肤层（最后加载，覆盖以上所有样式） -->
+<link rel="stylesheet" href="spread.css">
+  <link rel="stylesheet" href="pt.css">
+  <script>(function(){try{var f=JSON.parse(sessionStorage.getItem("lumen_pt")||"null");if(f&&Date.now()-f.t<30000){document.documentElement.classList.add("pt-pending");setTimeout(function(){document.documentElement.classList.remove("pt-pending")},3000);}}catch(e){}})();</script>
+</head>
+<body>
+<div id="pt-panel" aria-hidden="true"></div>
+
+<!-- ==================== Page Head（列表/求书视图） ==================== -->
+<section class="page-head" id="pageHeadMain">
+  <div class="container">
+    <div class="surface page-head-inner">
+
+      <div class="breadcrumb" id="crumbMain">
+        <a href="index.html">首页</a>
+        <span class="sep">/</span>
+        <span>书话</span>
+      </div>
+
+      <h1 class="page-title" id="pageTitleMain">书话</h1>
+      <p class="page-sub" id="pageSubMain">
+        读后想说的话，和想找的书，都在这里。
+      </p>
+
+      <button class="wanted-fab" id="wantedFab" type="button">+ 发布寻书</button>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Page Head（详情视图，隐藏） ==================== -->
+<section class="page-head" id="pageHeadDetail" style="display:none;">
+  <div class="container">
+    <div class="surface page-head-inner">
+      <div class="breadcrumb">
+        <a href="index.html">首页</a>
+        <span class="sep">/</span>
+        <a href="reviews.html">书话</a>
+        <span class="sep">/</span>
+        <span id="crumbDetail">书评详情</span>
+      </div>
+      <h1 class="page-title" id="detailPageTitle">书评详情</h1>
+      <p class="page-sub" id="detailPageSub">一条完整的读后感受。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 书评列表（默认视图） ==================== -->
+<section class="container" id="viewReviews">
+  <!-- 话题筛选栏 -->
+  <div class="topic-bar-wrap reveal">
+    <div class="topic-bar-label">正在讨论</div>
+    <div class="topic-bar" id="topicBar">
+      <button class="topic-chip active" data-topic="all">全部</button>
+      <button class="topic-chip" data-topic="1"># 大学四年改变我的书</button>
+      <button class="topic-chip" data-topic="2"># 大一新生防迷茫指南</button>
+      <button class="topic-chip" data-topic="3"># 宿舍熄灯后的夜读</button>
+      <button class="topic-chip" data-topic="4"># 考研人的续命书</button>
+      <button class="topic-chip" data-topic="5"># 治愈精神内耗的处方</button>
+      <button class="topic-chip" data-topic="6"># 学会与自己独处</button>
+      <button class="topic-chip" data-topic="7"># 关于爱与亲密关系</button>
+      <button class="topic-chip" data-topic="8"># 在焦虑时代如何自洽</button>
+      <button class="topic-chip" data-topic="9"># 文科生的经济学启蒙</button>
+      <button class="topic-chip" data-topic="10"># 看懂世界的运转逻辑</button>
+      <button class="topic-chip" data-topic="11"># AI 时代的生存指南</button>
+      <button class="topic-chip" data-topic="12"># 中文系教授的私藏书单</button>
+      <button class="topic-chip" data-topic="13"># 一口气读完的悬疑神作</button>
+      <button class="topic-chip" data-topic="14"># 科幻迷的星辰大海</button>
+      <button class="topic-chip" data-topic="15"># 被书名耽误的好书</button>
+      <button class="topic-chip" data-topic="16"># 书比电影好看的原著</button>
+      <button class="topic-chip" data-topic="17"># 书页里的前任主人</button>
+      <button class="topic-chip" data-topic="18"># 绝版多年的心头好</button>
+      <button class="topic-chip" data-topic="19"># 买来只翻过前三页的书</button>
+      <button class="topic-chip" data-topic="20"># 陪我度过低谷的书</button>
+    </div>
+  </div>
+  <div class="review-grid" id="reviewGrid">
+
+    <article class="review-card reveal" data-review-id="1">
+      <div class="rv-head">
+        <span class="avatar" style="--book-bg:#111111">林</span>
+        <div class="rv-user">
+          <strong>林清和</strong>
+          <span>新闻传播学院 · 大三</span>
+        </div>
+        <span class="rv-time">3 天前</span>
+      </div>
+
+      <h3 class="rv-title">
+        用「课题分离」，把自己从别人的评价里解放出来
+      </h3>
+
+      <p class="rv-text">
+        第一次读阿德勒，是在大三上学期最焦虑的一段时候。那时候刚做完一个小组作业，
+        因为组员的一句评价，我整整一个星期都在复盘自己是不是哪里做错了……
+        最触动我的是「课题分离」——你无法替别人决定怎么看你。
+      </p>
+
+      <a class="rv-book-inline" href="book.html?id=beitaoyan">
+        <span class="mini-cover" style="--book-bg:#111111"></span>
+        <span>《被讨厌的勇气》</span>
+        <span class="rv-book-arrow">→</span>
+      </a>
+
+      <div class="rv-foot">
+        <span class="rv-likes">♥ 128</span>
+        <span class="rv-replies">💬 12</span>
+        <span class="rv-stars">★★★★★</span>
+      </div>
+    </article>
+
+    <article class="review-card reveal" data-review-id="2">
+      <div class="rv-head">
+        <span class="avatar" style="--book-bg:#c0c0c0;color:#111">周</span>
+        <div class="rv-user">
+          <strong>周砚辞</strong>
+          <span>经济学院 · 大四</span>
+        </div>
+        <span class="rv-time">5 天前</span>
+      </div>
+
+      <h3 class="rv-title">
+        第一次把宏观概念和身边的城市变化对上号
+      </h3>
+
+      <p class="rv-text">
+        作为经济学院的学生，我读过很多宏观教材，但大多是模型和曲线，离生活很远。
+        这本书从地方政府的行为讲起，把土地财政、招商引资、城投债变成看得见的东西——
+        作者不喊口号，只是把账算给你看。
+      </p>
+
+      <a class="rv-book-inline" href="book.html?id=zhishenshizheng">
+        <span class="mini-cover" style="--book-bg:#c0c0c0"></span>
+        <span>《置身事内》</span>
+        <span class="rv-book-arrow">→</span>
+      </a>
+
+      <div class="rv-foot">
+        <span class="rv-likes">♥ 204</span>
+        <span class="rv-replies">💬 31</span>
+        <span class="rv-stars">★★★★☆</span>
+      </div>
+    </article>
+
+    <article class="review-card reveal" data-review-id="3">
+      <div class="rv-head">
+        <span class="avatar" style="--book-bg:#A1DB67">苏</span>
+        <div class="rv-user">
+          <strong>苏昀</strong>
+          <span>中文系 · 研一</span>
+        </div>
+        <span class="rv-time">1 周前</span>
+      </div>
+
+      <h3 class="rv-title">
+        第三遍读，终于读懂了那些重复的名字
+      </h3>
+
+      <p class="rv-text">
+        第一遍读是大一，被那些重复的人名劝退；第二遍读是大三，勉强读完，只觉得「魔幻」；
+        第三遍读到现在，才终于读出另一种东西——马尔克斯写的不是魔幻，是拉美真实的记忆方式。
+      </p>
+
+      <a class="rv-book-inline" href="book.html?id=bainiangudu">
+        <span class="mini-cover" style="--book-bg:#A1DB67"></span>
+        <span>《百年孤独》</span>
+        <span class="rv-book-arrow">→</span>
+      </a>
+
+      <div class="rv-foot">
+        <span class="rv-likes">♥ 176</span>
+        <span class="rv-replies">💬 24</span>
+        <span class="rv-stars">★★★★★</span>
+      </div>
+    </article>
+
+    <article class="review-card reveal" data-review-id="4">
+      <div class="rv-head">
+        <span class="avatar" style="--book-bg:#111111">郑</span>
+        <div class="rv-user">
+          <strong>郑一鸣</strong>
+          <span>计算机学院 · 大二</span>
+        </div>
+        <span class="rv-time">1 周前</span>
+      </div>
+
+      <h3 class="rv-title">
+        系统 1 和系统 2：解释了我为什么总是「事后才想明白」
+      </h3>
+
+      <p class="rv-text">
+        读完最大的收获是：我终于理解了自己为什么经常「事后才想明白」。
+        大部分时候，是系统 1 在替我决策，而系统 2 在偷懒——
+        锚定效应、损失厌恶、峰终定律，每个都能直接用在生活里。
+      </p>
+
+      <a class="rv-book-inline" href="market.html?q=思考，快与慢">
+        <span class="mini-cover" style="--book-bg:#111111"></span>
+        <span>《思考，快与慢》</span>
+        <span class="rv-book-arrow">→</span>
+      </a>
+
+      <div class="rv-foot">
+        <span class="rv-likes">♥ 96</span>
+        <span class="rv-replies">💬 8</span>
+        <span class="rv-stars">★★★★☆</span>
+      </div>
+    </article>
+
+    <article class="review-card reveal" data-review-id="5">
+      <div class="rv-head">
+        <span class="avatar" style="--book-bg:#c0c0c0;color:#111">何</span>
+        <div class="rv-user">
+          <strong>何叙</strong>
+          <span>哲学系 · 大三</span>
+        </div>
+        <span class="rv-time">2 周前</span>
+      </div>
+
+      <h3 class="rv-title">
+        梭罗不是让你去湖边隐居，而是提醒你节奏可以自己定
+      </h3>
+
+      <p class="rv-text">
+        梭罗在湖边住了两年两个月，不是为了逃避社会，而是为了做一个实验：
+        如果把生活降到最简单的程度，我到底需要多少东西？
+        读完之后，我把手机里好几个 App 卸了。
+      </p>
+
+      <a class="rv-book-inline" href="book.html?id=waerdeng">
+        <span class="mini-cover" style="--book-bg:#c0c0c0"></span>
+        <span>《瓦尔登湖》</span>
+        <span class="rv-book-arrow">→</span>
+      </a>
+
+      <div class="rv-foot">
+        <span class="rv-likes">♥ 142</span>
+        <span class="rv-replies">💬 19</span>
+        <span class="rv-stars">★★★★★</span>
+      </div>
+    </article>
+
+    <article class="review-card reveal" data-review-id="6">
+      <div class="rv-head">
+        <span class="avatar" style="--book-bg:#A1DB67">陈</span>
+        <div class="rv-user">
+          <strong>陈默</strong>
+          <span>社会学系 · 研二</span>
+        </div>
+        <span class="rv-time">3 周前</span>
+      </div>
+
+      <h3 class="rv-title">
+        很多你以为是自己不够努力的问题，其实是结构性的
+      </h3>
+
+      <p class="rv-text">
+        米尔斯把「个人困扰」和「公共议题」区分得很清楚。这本书最珍贵的地方，
+        是给了你一副「社会学的眼镜」——让你看到一件事时，会先问一句：
+        这是个人的问题，还是结构的问题？
+      </p>
+
+      <a class="rv-book-inline" href="market.html?q=社会学的想象力">
+        <span class="mini-cover" style="--book-bg:#A1DB67"></span>
+        <span>《社会学的想象力》</span>
+        <span class="rv-book-arrow">→</span>
+      </a>
+
+      <div class="rv-foot">
+        <span class="rv-likes">♥ 87</span>
+        <span class="rv-replies">💬 14</span>
+        <span class="rv-stars">★★★★★</span>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ==================== 书评详情（隐藏视图） ==================== -->
+<section class="container" id="viewDetail" style="display:none;">
+  <div class="detail-wrap">
+
+    <!-- 正文 -->
+    <article class="surface article-card">
+      <div class="article-head">
+        <span class="avatar" id="dAvatar" style="--book-bg:#111111">林</span>
+        <div class="who">
+          <strong id="dName">林清和</strong>
+          <span id="dRole">新闻传播学院 · 大三</span>
+          <span class="date" id="dDate">2026-09-10</span>
+        </div>
+        <span class="stars" id="dStars">★★★★★</span>
+      </div>
+
+      <a class="article-book-tag" id="dBookTag" href="book.html?id=beitaoyan">
+        <span class="mini-cover" style="--book-bg:#111111" data-cover="beitaoyan"></span>
+        <span id="dBookTitle">《被讨厌的勇气》</span>
+        <span style="color:var(--text-faint);">·</span>
+        <span style="color:var(--accent);font-weight:700;">看在售 →</span>
+      </a>
+
+      <h1 class="article-title" id="dTitle">用「课题分离」，把自己从别人的评价里解放出来</h1>
+
+      <div class="article-body" id="dBody">
+        <!-- JS 填充 -->
+      </div>
+
+      <div class="article-foot">
+        <span class="stat">赞同 <b id="dLikes">128</b></span>
+        <span class="stat">回复 <b id="dReplies">12</b></span>
+        <span class="stat">收藏 <b id="dFavs">34</b></span>
+        <div class="actions">
+          <button class="btn-mini" type="button" id="likeBtn">赞同</button>
+          <button class="btn-mini" type="button" id="favBtn">收藏</button>
+          <a class="btn-mini primary" id="dBuyBtn" href="book.html?id=beitaoyan">买同款 →</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 侧栏 -->
+    <aside>
+      <div class="surface side-card">
+        <h4>这条书评提到的书</h4>
+        <div class="side-book" onclick="location.href='book.html?id=beitaoyan'">
+          <span class="cover-sm" style="--book-bg:#111111" data-cover="beitaoyan"></span>
+          <div class="info">
+            <h5>被讨厌的勇气</h5>
+            <p>岸见一郎 · 机械工业出版社</p>
+          </div>
+          <span class="price"><small>¥</small>22</span>
+        </div>
+      </div>
+
+      <div class="surface side-card">
+        <h4>同作者 / 同主题</h4>
+        <div class="side-book" onclick="location.href='market.html?q=思考，快与慢'">
+          <span class="cover-sm" style="--book-bg:#c0c0c0" data-cover="sikao"></span>
+          <div class="info">
+            <h5>思考，快与慢</h5>
+            <p>丹尼尔·卡尼曼 · 中信出版社</p>
+          </div>
+          <span class="price"><small>¥</small>28</span>
+        </div>
+        <div class="side-book" onclick="location.href='market.html?q=社会学的想象力'">
+          <span class="cover-sm" style="--book-bg:#A1DB67" data-cover="shehuixue"></span>
+          <div class="info">
+            <h5>社会学的想象力</h5>
+            <p>C. 赖特·米尔斯 · 北京师范大学出版社</p>
+          </div>
+          <span class="price"><small>¥</small>14</span>
+        </div>
+        <div class="side-book" onclick="location.href='market.html?q=乌合之众'">
+          <span class="cover-sm" style="--book-bg:#111111" data-cover="wuyanzhizhong"></span>
+          <div class="info">
+            <h5>乌合之众</h5>
+            <p>古斯塔夫·勒庞 · 中央编译出版社</p>
+          </div>
+          <span class="price"><small>¥</small>12</span>
+        </div>
+      </div>
+
+      <div class="surface side-card">
+        <h4>更多书评</h4>
+        <div class="side-book" onclick="location.href='reviews.html?id=2'">
+          <span class="cover-sm" style="--book-bg:#c0c0c0" data-cover="zhishenshizheng"></span>
+          <div class="info">
+            <h5>《置身事内》</h5>
+            <p>周砚辞 · 经济学院</p>
+          </div>
+        </div>
+        <div class="side-book" onclick="location.href='reviews.html?id=3'">
+          <span class="cover-sm" style="--book-bg:#A1DB67" data-cover="bainiangudu"></span>
+          <div class="info">
+            <h5>《百年孤独》</h5>
+            <p>苏昀 · 中文系</p>
+          </div>
+        </div>
+        <div class="side-book" onclick="location.href='reviews.html?id=5'">
+          <span class="cover-sm" style="--book-bg:#c0c0c0" data-cover="waerdeng"></span>
+          <div class="info">
+            <h5>《瓦尔登湖》</h5>
+            <p>何叙 · 哲学系</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ==================== 发布求书弹层 ==================== -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>发布寻书</h3>
+    <p class="sub">填写书名与期望价，发布后有货的人会主动联系你。发布免费。</p>
+
+    <div class="modal-fields">
+      <div class="field">
+        <label>书名</label>
+        <input type="text" id="wBook" placeholder="如：社会学的想象力">
+      </div>
+      <div class="field">
+        <label>作者 / 出版社（选填）</label>
+        <input type="text" id="wAuthor" placeholder="如：C. 赖特·米尔斯 · 北京师范大学出版社">
+      </div>
+      <div class="field">
+        <label>期望价格</label>
+        <div class="row">
+          <input type="number" id="wPriceMin" placeholder="最低价（选填）" min="0">
+          <input type="number" id="wPriceMax" placeholder="最高价（必填）" min="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>补充说明（选填）</label>
+        <textarea id="wNote" placeholder="如：只要正版，无严重破损即可，可以接受少量笔记。"></textarea>
+      </div>
+      <div class="field">
+        <label>所在城市</label>
+        <input type="text" id="wCity" placeholder="如：武汉">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-ghost" type="button" id="modalCancel">取消</button>
+      <button class="btn-primary" type="button" id="modalConfirm">发布寻书</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ==================== Footer ==================== -->
+<div class="site-footer-wrap">
+  <footer class="site-footer container">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <a class="logo" href="index.html">
+          <span class="logo-mark">L</span>
+          <span class="logo-text">
+            <b>LUMEN</b>
+            <em>Books</em>
+          </span>
+        </a>
+        <p>大学生二手书流转平台 · 扫码卖书 · 按品相定价 · 担保交易。<br>让每一本旧书遇见下一位读者。</p>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <h5>Discover</h5>
+          <a href="lists.html">书单</a>
+          <a href="market.html">淘书</a>
+          <a href="reviews.html">书话</a>
+        </div>
+        <div>
+          <h5>Service</h5>
+          <a href="sell.html">卖书</a>
+          <a href="sell.html#rules">回收规则</a>
+          <a href="#">交易担保</a>
+          <a href="#">售后仲裁</a>
+        </div>
+        <div>
+          <h5>About</h5>
+          <a href="#">平台规则</a>
+          <a href="#">联系我们</a>
+          <a href="#">使用条款</a>
+          <a href="#">隐私说明</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LUMEN BOOKS · 仅用于学习交流</span>
+      <span>Reading makes us meet.</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   书评数据
+   ============================================================ */
+const REVIEWS = {
+  1: {
+    user: '林清和', avatar: '林', bg: '#111111',
+    role: '新闻传播学院 · 大三', time: '3 天前', date: '2026-09-10',
+    stars: '★★★★★', likes: 128, replies: 12, favs: 34,
+    topics: [5, 6, 20],   // 治愈精神内耗 / 学会独处 / 度过低谷
+    bookId: 'beitaoyan', bookTitle: '《被讨厌的勇气》',
+    title: '用「课题分离」，把自己从别人的评价里解放出来',
+    body: [
+      '第一次读阿德勒，是在大三上学期最焦虑的一段时候。那时候刚做完一个小组作业，因为组员的一句评价，我整整一个星期都在复盘自己是不是哪里做错了。',
+      '这本书用对话体的形式把阿德勒心理学讲得非常轻，几乎没有阅读门槛。但真正击中我的，是「<b>课题分离</b>」这个概念——',
+      '<blockquote>“你无法替别人决定怎么看你，你能做的只是把属于自己的那部分做好。”</blockquote>',
+      '读到这里的时候我停了一下。原来我一直在做的，是把别人的课题当成自己的课题：别人怎么评价我、别人是不是喜欢我、别人会不会觉得我不够好。而这些，本来就不是我能控制的。',
+      '书里还有一句我抄在笔记本上的话：<b>“自由，就是不再寻求认可。”</b>',
+      '看完之后，我在人际交往里松弛了很多。不是不在乎别人了，而是终于分清了哪些事该我负责、哪些事不该我操心。'
+    ]
+  },
+  2: {
+    user: '周砚辞', avatar: '周', bg: '#c0c0c0', dark: true,
+    role: '经济学院 · 大四', time: '5 天前', date: '2026-09-08',
+    stars: '★★★★☆', likes: 204, replies: 31, favs: 67,
+    topics: [9, 10],   // 文科生的经济学启蒙 / 看懂世界的运转逻辑
+    bookId: 'zhishenshizheng', bookTitle: '《置身事内》',
+    title: '第一次把宏观概念和身边的城市变化对上号',
+    body: [
+      '作为经济学院的学生，我读过很多宏观教材，但大多是模型和曲线，离生活很远。这本书不一样，它从地方政府的行为讲起，把土地财政、招商引资、城投债这些词变成看得见的东西。',
+      '作者不喊口号，只是把账算给你看。比如为什么地方政府这么在意 GDP、为什么基建投资这么密集、为什么房价和土地出让金绑得这么紧——读完你会明白，很多现象背后都有具体的行为逻辑。',
+      '<blockquote>“地方政府不仅是市场经济的裁判员，也是深度参与者。”</blockquote>',
+      '这本书让我第一次意识到：我在的城市地铁为什么修到那里、新区为什么建在那个位置，都不是偶然。',
+      '推荐给每一个想读懂中国经济的同学。'
+    ]
+  },
+  3: {
+    user: '苏昀', avatar: '苏', bg: '#A1DB67',
+    role: '中文系 · 研一', time: '1 周前', date: '2026-09-05',
+    stars: '★★★★★', likes: 176, replies: 24, favs: 52,
+    topics: [3, 6, 20],   // 熄灯后的夜读 / 学会独处 / 度过低谷
+    bookId: 'bainiangudu', bookTitle: '《百年孤独》',
+    title: '第三遍读，终于读懂了那些重复的名字',
+    body: [
+      '第一遍读《百年孤独》是大一，被那些重复的人名劝退。第二遍读是大三，勉强读完了，但只觉得「魔幻」。第三遍读是现在，终于读出了另一种东西。',
+      '马尔克斯写的不是魔幻，是拉美真实的记忆方式。当一件事被反复讲述，它就变成了宿命；当一个名字被反复使用，它就变成了一种轮回。',
+      '<blockquote>“家族的第一个人被捆在树上，最后一个人正被蚂蚁吃掉。”</blockquote>',
+      '读完像做了一场很长的梦。醒来之后你依然记得那些雨、那些黄蝴蝶、那个冰块做的下午。',
+      '如果你也读不下去，别急，再等等。有些书需要你到了那个年纪才读得进去。'
+    ]
+  },
+  4: {
+    user: '郑一鸣', avatar: '郑', bg: '#111111',
+    role: '计算机学院 · 大二', time: '1 周前', date: '2026-09-03',
+    stars: '★★★★☆', likes: 96, replies: 8, favs: 28,
+    topics: [5, 8],   // 治愈精神内耗 / 焦虑时代自洽
+    bookId: '', bookTitle: '《思考，快与慢》',
+    title: '系统 1 和系统 2：解释了我为什么总是「事后才想明白」',
+    body: [
+      '卡尼曼把人的思考分成两个系统：系统 1 是快速的、直觉的、几乎不消耗能量的；系统 2 是缓慢的、理性的、需要刻意调动的。',
+      '读完最大的收获是：我终于理解了自己为什么经常「事后才想明白」。因为大部分时候，是系统 1 在替我决策，而系统 2 在偷懒。',
+      '书里有很多可以立刻用上的概念：锚定效应、损失厌恶、峰终定律。每个都配了实验，读起来不枯燥。',
+      '书有点厚，建议一章一章读，读完一章用一句话总结。这样读完整本，你会得到一套属于自己的思维工具。'
+    ]
+  },
+  5: {
+    user: '何叙', avatar: '何', bg: '#c0c0c0', dark: true,
+    role: '哲学系 · 大三', time: '2 周前', date: '2026-09-01',
+    stars: '★★★★★', likes: 142, replies: 19, favs: 44,
+    topics: [6, 20],   // 学会独处 / 度过低谷
+    bookId: 'waerdeng', bookTitle: '《瓦尔登湖》',
+    title: '梭罗不是让你去湖边隐居，而是提醒你节奏可以自己定',
+    body: [
+      '很多人把《瓦尔登湖》当成一本「逃离城市」的书，但我觉得它其实是一本关于「<b>如何选择自己的节奏</b>」的书。',
+      '梭罗在湖边住了两年两个月，不是为了逃避社会，而是为了做一个实验：如果我把生活降到最简单的程度，我到底需要多少东西？',
+      '<blockquote>“我步入丛林，因为我希望生活得有意义……我希望活得深刻，吸取生命中所有的精华。”</blockquote>',
+      '读完之后，我把手机里好几个 App 卸了。不是因为它们不好，而是因为我意识到：很多我以为「必须知道」的信息，其实只是别人替我定义的节奏。',
+      '这本书适合慢读，一天读几页就好。'
+    ]
+  },
+  6: {
+    user: '陈默', avatar: '陈', bg: '#A1DB67',
+    role: '社会学系 · 研二', time: '3 周前', date: '2026-08-28',
+    stars: '★★★★★', likes: 87, replies: 14, favs: 26,
+    topics: [10],   // 看懂世界的运转逻辑
+    bookId: '', bookTitle: '《社会学的想象力》',
+    title: '很多你以为是自己不够努力的问题，其实是结构性的',
+    body: [
+      '米尔斯把「个人困扰」和「公共议题」区分得很清楚。比如一个人失业，是他的个人困扰；但如果一个城市有 10% 的人失业，那就是公共议题。',
+      '这本书最珍贵的地方，是它给了你一副「社会学的眼镜」：让你在看到一件事的时候，会先问一句——这是个人的问题，还是结构的问题？',
+      '读完最大的收获是：对自己宽容了一些。很多你以为是自己不够努力的问题，其实是结构性的。',
+      '这本书不厚，但值得反复读。建议搭配《乡土中国》一起看，理解中国社会的结构。'
+    ]
+  }
+};
+
+/* ============================================================
+   赞同 / 收藏：localStorage 持久化
+   注意：这里必须先声明，showDetail() 初始化时要立刻用到它们
+   ============================================================ */
+const REVIEW_LIKE_KEY = 'lumen_review_likes';
+const REVIEW_FAV_KEY  = 'lumen_review_favs';
+
+const likeBtn = document.getElementById('likeBtn');
+const favBtn  = document.getElementById('favBtn');
+
+let liked = false;
+let faved = false;
+
+function readMap(key){
+  try { return JSON.parse(localStorage.getItem(key)) || {}; }
+  catch (e) { return {}; }
+}
+function writeMap(key, val){
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+}
+
+/* 把当前书评的「已赞同 / 已收藏」状态刷到按钮与数字上 */
+function applyReviewState(){
+  const r = REVIEWS[reviewId];
+  if (!r) return;
+
+  liked = !!readMap(REVIEW_LIKE_KEY)[reviewId];
+  faved = !!readMap(REVIEW_FAV_KEY)[reviewId];
+
+  document.getElementById('dLikes').textContent = r.likes + (liked ? 1 : 0);
+  document.getElementById('dFavs').textContent  = r.favs  + (faved ? 1 : 0);
+
+  likeBtn.textContent = liked ? '已赞同' : '赞同';
+  likeBtn.style.background  = liked ? 'var(--accent)' : '';
+  likeBtn.style.color       = liked ? '#fff' : '';
+  likeBtn.style.borderColor = liked ? 'var(--accent)' : '';
+
+  favBtn.textContent = faved ? '已收藏' : '收藏';
+  favBtn.style.background  = faved ? 'var(--accent)' : '';
+  favBtn.style.color       = faved ? '#fff' : '';
+  favBtn.style.borderColor = faved ? 'var(--accent)' : '';
+}
+
+/* ============================================================
+   视图切换（书评列表 / 书评详情）
+   ============================================================ */
+const params = new URLSearchParams(location.search);
+const reviewId = params.get('id');
+
+const pageHeadMain = document.getElementById('pageHeadMain');
+const pageHeadDetail = document.getElementById('pageHeadDetail');
+const viewReviews = document.getElementById('viewReviews');
+const viewDetail = document.getElementById('viewDetail');
+
+function showReviews(){
+  const topicWrap = document.getElementById('topicBarWrap');
+  if (topicWrap) topicWrap.style.display = '';
+
+  pageHeadMain.style.display = '';
+  pageHeadDetail.style.display = 'none';
+  viewReviews.style.display = '';
+  viewDetail.style.display = 'none';
+  document.title = '书话 · LUMEN BOOKS';
+}
+
+function showDetail(id){
+  const r = REVIEWS[id];
+  if (!r) { showReviews(); return; }
+
+  const topicWrap = document.getElementById('topicBarWrap');
+  if (topicWrap) topicWrap.style.display = 'none';
+
+  pageHeadMain.style.display = 'none';
+  pageHeadDetail.style.display = '';
+  viewReviews.style.display = 'none';
+  viewDetail.style.display = '';
+
+  document.getElementById('crumbDetail').textContent = r.title;
+  document.getElementById('detailPageTitle').textContent = r.bookTitle + ' · 书评';
+  document.getElementById('detailPageSub').textContent =
+    '由 ' + r.user + ' 发布于 ' + r.date;
+  document.title = r.title + ' · LUMEN BOOKS';
+
+  // 头部
+  const av = document.getElementById('dAvatar');
+  av.textContent = r.avatar;
+  av.style.setProperty('--book-bg', r.bg);
+  av.style.color = r.dark ? '#111' : '#fff';
+
+  document.getElementById('dName').textContent = r.user;
+  document.getElementById('dRole').textContent = r.role;
+  document.getElementById('dDate').textContent = r.date;
+  document.getElementById('dStars').textContent = r.stars;
+
+  // 书籍标签
+  const tag = document.getElementById('dBookTag');
+  const tagCover = tag.querySelector('.mini-cover');
+  tagCover.style.setProperty('--book-bg', r.bg);
+  if (r.bookId) {
+    const rb = Store.getBook(r.bookId);
+    if (rb && rb.cover) tagCover.style.backgroundImage = "url('" + rb.cover + "')";
+  }
+  document.getElementById('dBookTitle').textContent = r.bookTitle;
+
+  if (r.bookId) {
+    tag.href = 'book.html?id=' + r.bookId;
+    tag.style.display = '';
+    document.getElementById('dBuyBtn').href = 'book.html?id=' + r.bookId;
+  } else {
+    const q = r.bookTitle.replace(/[《》]/g, '');
+    tag.href = 'market.html?q=' + encodeURIComponent(q);
+    document.getElementById('dBuyBtn').href = 'market.html?q=' + encodeURIComponent(q);
+  }
+
+  // 正文
+  document.getElementById('dTitle').textContent = r.title;
+  document.getElementById('dBody').innerHTML = r.body.map(p => {
+    if (p.startsWith('<blockquote>')) return p;
+    return '<p>' + p + '</p>';
+  }).join('');
+
+  // 回复数固定，赞同 / 收藏数从 localStorage 恢复
+  document.getElementById('dReplies').textContent = r.replies;
+  applyReviewState();
+}
+
+/* 书评卡片点击 → 详情 */
+document.querySelectorAll('#reviewGrid .review-card').forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('a')) return; // 点到卡片里的书籍链接就不进详情
+    const id = card.dataset.reviewId;
+    if (id) location.href = 'reviews.html?id=' + id;
+  });
+});
+
+/* 路由 */
+if (reviewId && REVIEWS[reviewId]) {
+  showDetail(reviewId);
+} else {
+  showReviews();
+}
+
+/* ============================================================
+   赞同 / 收藏（写入 localStorage，刷新后仍保留）
+   ============================================================ */
+likeBtn.addEventListener('click', () => {
+  const r = REVIEWS[reviewId];
+  if (!r) { toast('请先打开一条书评'); return; }
+
+  liked = !liked;
+  const likes = readMap(REVIEW_LIKE_KEY);
+  if (liked) likes[reviewId] = true; else delete likes[reviewId];
+  writeMap(REVIEW_LIKE_KEY, likes);
+
+  document.getElementById('dLikes').textContent = r.likes + (liked ? 1 : 0);
+  likeBtn.textContent = liked ? '已赞同' : '赞同';
+  likeBtn.style.background = liked ? 'var(--accent)' : '';
+  likeBtn.style.color = liked ? '#fff' : '';
+  likeBtn.style.borderColor = liked ? 'var(--accent)' : '';
+});
+
+favBtn.addEventListener('click', () => {
+  const r = REVIEWS[reviewId];
+  if (!r) { toast('请先打开一条书评'); return; }
+
+  faved = !faved;
+  const favs = readMap(REVIEW_FAV_KEY);
+  if (faved) favs[reviewId] = true; else delete favs[reviewId];
+  writeMap(REVIEW_FAV_KEY, favs);
+
+  document.getElementById('dFavs').textContent = r.favs + (faved ? 1 : 0);
+  favBtn.textContent = faved ? '已收藏' : '收藏';
+  favBtn.style.background = faved ? 'var(--accent)' : '';
+  favBtn.style.color = faved ? '#fff' : '';
+  favBtn.style.borderColor = faved ? 'var(--accent)' : '';
+});
+
+/* ============================================================
+   发布求书
+   ============================================================ */
+const overlay = document.getElementById('overlay');
+const wantedFab = document.getElementById('wantedFab');
+
+wantedFab.addEventListener('click', () => {
+  overlay.classList.add('show');
+});
+document.getElementById('modalCancel').addEventListener('click', () => {
+  overlay.classList.remove('show');
+});
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) overlay.classList.remove('show');
+});
+
+/* Toast */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+document.getElementById('modalConfirm').addEventListener('click', () => {
+  const book = document.getElementById('wBook').value.trim();
+  const pMax = document.getElementById('wPriceMax').value;
+
+  if (!book) { toast('请填写书名'); return; }
+  if (!pMax) { toast('请填写期望最高价'); return; }
+
+  overlay.classList.remove('show');
+  document.getElementById('wBook').value = '';
+  document.getElementById('wAuthor').value = '';
+  document.getElementById('wPriceMin').value = '';
+  document.getElementById('wPriceMax').value = '';
+  document.getElementById('wNote').value = '';
+  document.getElementById('wCity').value = '';
+
+  toast('寻书已发布');
+});
+
+/* ============================================================
+   Header 登录态
+   ============================================================ */
+(function(){
+  const session = JSON.parse(localStorage.getItem('lumen_session') || 'null');
+  const btn = document.getElementById('loginBtn');
+  if (!btn) return;
+  if (session && session.account) {
+    btn.textContent = '个人中心';
+    btn.href = 'profile.html';
+    btn.style.background = 'var(--text)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--text)';
+  }
+})();
+
+/* ---------- Reveal ---------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = (i % 3) * 80 + 'ms';
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ============================================================
+   话题筛选：20 个话题，按 REVIEWS[id].topics 真实过滤
+   ============================================================ */
+(function () {
+  const topicBar = document.getElementById('topicBar');
+  if (!topicBar) return;
+
+  topicBar.addEventListener('click', function (e) {
+    const btn = e.target.closest('.topic-chip');
+    if (!btn) return;
+
+    topicBar.querySelectorAll('.topic-chip').forEach(function (c) {
+      c.classList.toggle('active', c === btn);
+    });
+
+    const topicId = btn.dataset.topic;
+    document.querySelectorAll('#reviewGrid .review-card').forEach(function (card) {
+      const r = REVIEWS[card.dataset.reviewId];
+      const show = topicId === 'all' ||
+        (r && r.topics && r.topics.indexOf(parseInt(topicId, 10)) >= 0);
+      card.style.display = show ? '' : 'none';
+    });
+  });
+})();
+</script><script src="auth.js"></script><script src="nav-ball.js" defer></script>
+<!-- 方案 B · 一页之间：书签绸带 + 跨页刊头 -->
+<script src="spread.js"></script>
+  <script src="pt.js" defer></script>
+</body>
+</html>

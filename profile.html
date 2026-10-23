@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人中心 · LUMEN BOOKS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="common.css">
+<style>
+button{font-family:inherit;cursor:pointer;}
+.btn-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--text);color:#fff;
+  padding:12px 24px;border-radius:999px;
+  font-size:14px;font-weight:600;
+  transition:.25s;white-space:nowrap;border:1.5px solid var(--text);
+}
+.btn-primary:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-2px);}
+.btn-ghost{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1.5px solid var(--line);color:var(--text);
+  background:var(--glass-strong);font-size:14px;font-weight:600;
+  padding:12px 24px;border-radius:999px;transition:.25s;
+}
+.user-chip{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 16px 6px 6px;border-radius:999px;
+  background:var(--glass-soft);border:1px solid var(--line);
+}
+.user-chip .avatar-sm{
+  width:32px;height:32px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--accent);color:#fff;font-size:13px;font-weight:800;
+}
+.user-chip .name-sm{
+  font-size:13.5px;font-weight:700;color:var(--text);
+  max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* ============================================================
+   个人中心布局
+   ============================================================ */
+.profile-head{padding:16px 0 8px;}
+.profile-head-inner{padding:36px 44px;}
+.profile-top{
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+}
+.avatar-lg{
+  width:72px;height:72px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--text);color:#fff;font-size:26px;font-weight:800;
+  letter-spacing:-.02em;
+}
+.profile-top .who{flex:1;min-width:200px;}
+.profile-top .who h1{
+  font-size:24px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.profile-top .who h1 .verified{
+  font-size:11px;font-weight:700;color:var(--accent);
+  padding:3px 9px;border-radius:7px;background:var(--accent-bg);
+  border:1px solid rgba(53,107,74,.40);
+}
+.profile-top .who p{
+  margin:0;color:var(--text-faint);font-size:13.5px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.profile-top .who p b{color:var(--text-dim);font-weight:600;}
+.profile-head-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.profile-stats{
+  margin-top:28px;padding-top:24px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+}
+.profile-stats .stat{display:flex;flex-direction:column;gap:4px;}
+.profile-stats .stat b{
+  font-size:26px;font-weight:800;letter-spacing:-0.02em;line-height:1.1;
+  color:var(--text);
+}
+.profile-stats .stat span{
+  font-size:11.5px;color:var(--text-faint);
+  letter-spacing:.08em;text-transform:uppercase;
+}
+/* 主体：侧栏 + 内容 */
+.profile-layout{
+  display:grid;grid-template-columns:240px 1fr;gap:24px;
+  padding:16px 0 32px;align-items:start;
+}
+/* 侧栏 */
+.side-nav{padding:22px 16px;}
+.side-nav button{
+  display:flex;align-items:center;gap:12px;
+  width:100%;border:0;background:transparent;
+  font-size:14px;font-weight:600;color:var(--text-dim);
+  padding:13px 16px;border-radius:14px;
+  transition:.25s;text-align:left;
+}
+.side-nav button:hover{background:rgba(0,0,0,.04);color:var(--text);}
+.side-nav button.active{
+  background:var(--text);color:#fff;
+}
+.side-nav button.active svg{stroke:#fff;}
+.side-nav button svg{
+  width:16px;height:16px;flex:none;
+  stroke:var(--text-dim);fill:none;stroke-width:1.8;transition:.25s;
+}
+.side-nav button:hover svg{stroke:var(--text);}
+.side-nav .badge{
+  margin-left:auto;font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:999px;
+  background:var(--accent-bg);color:var(--accent);
+  border:1px solid rgba(53,107,74,.40);
+}
+.side-nav button.active .badge{
+  background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3);
+}
+.side-divider{
+  height:1px;background:var(--line);margin:12px 8px;
+}
+/* 内容面板 */
+.panel-body{padding:36px 40px;min-height:400px;}
+.panel-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:20px;padding-bottom:22px;margin-bottom:24px;
+  border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.panel-head h2{
+  font-size:22px;font-weight:800;margin:0 0 4px;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:10px;
+}
+.panel-head h2::before{
+  content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;
+}
+.panel-head p{margin:0;font-size:13.5px;color:var(--text-faint);}
+/* 空状态 */
+.empty{
+  padding:56px 20px;text-align:center;
+  color:var(--text-faint);font-size:14px;line-height:1.8;
+}
+.empty .empty-cover{
+  width:64px;height:82px;border-radius:5px;margin:0 auto 20px;
+  background:repeating-linear-gradient(45deg,#eaeaea 0 8px,#f6f6f6 8px 16px);
+  border:1px dashed var(--line-mid);
+}
+.empty b{display:block;color:var(--text);font-size:15px;font-weight:700;margin-bottom:6px;}
+.empty .btn-primary{margin-top:20px;}
+/* 订单卡片 */
+.order{
+  border:1.5px solid var(--line);border-radius:18px;
+  padding:20px 22px;margin-bottom:14px;transition:.25s;
+}
+.order:hover{border-color:var(--line-mid);}
+.order-top{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;margin-bottom:14px;flex-wrap:wrap;
+}
+.order-top .no{
+  font-size:12.5px;color:var(--text-faint);
+  font-variant-numeric:tabular-nums;
+}
+.order-top .status{
+  font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;
+}
+.status.paid{background:rgba(203,226,206,.72);color:#2f7d3f;}
+.status.shipping{background:var(--accent-bg);color:var(--accent);}
+.status.done{background:var(--glass-chip);color:var(--text-dim);}
+.status.cancel{background:var(--glass-chip);color:var(--text-faint);}
+.order-body{
+  display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;
+}
+.order-body .cover-sm{
+  width:44px;aspect-ratio:3/4.2;border-radius:4px;
+  background:var(--book-bg,#111);
+  border:1px solid rgba(255,255,255,.18);
+  position:relative;overflow:hidden;
+}
+.order-body .cover-sm::before{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(0,0,0,.25));
+}
+.order-body .info h4{
+  font-size:14.5px;font-weight:700;margin:0 0 3px;color:var(--text);
+}
+.order-body .info p{
+  font-size:12.5px;color:var(--text-faint);margin:0;
+}
+.order-body .price{
+  font-size:17px;font-weight:800;color:var(--accent);
+  font-variant-numeric:tabular-nums;
+}
+.order-body .price small{font-size:12px;font-weight:700;margin-right:1px;}
+.order-foot{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
+  margin-top:16px;padding-top:16px;border-top:1px solid var(--line);
+}
+.order-foot button{
+  font-size:12.5px;font-weight:600;
+  padding:8px 16px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--glass-strong);color:var(--text-dim);
+  transition:.25s;
+}
+.order-foot button:hover{border-color:var(--text);color:var(--text);}
+.order-foot button.primary{
+  background:var(--text);color:#fff;border-color:var(--text);
+}
+.order-foot button.primary:hover{background:var(--accent);border-color:var(--accent);}
+/* 收藏/书单卡片网格 */
+.grid-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+}
+.mini-card{
+  background:var(--glass-soft);border:1.5px solid var(--line);border-radius:18px;
+  padding:18px;display:flex;flex-direction:column;
+  transition:.25s;cursor:pointer;
+}
+.mini-card:hover{border-color:var(--line-mid);transform:translateY(-3px);}
+.mini-cover{
+  width:100%;aspect-ratio:3/4.2;border-radius:6px;margin-bottom:14px;
+  background:var(--book-bg,#111);
+  position:relative;overflow:hidden;
+  box-shadow:0 12px 24px -16px rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.18);
+}
+.mini-cover::before{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:6px;
+  background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(0,0,0,.25));
+}
+.mini-card h4{
+  font-size:14px;font-weight:700;margin:0 0 4px;color:var(--text);
+  line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.mini-card .meta{
+  font-size:12px;color:var(--text-faint);margin-bottom:12px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mini-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:12px;border-top:1px solid var(--line);margin-top:auto;
+}
+.mini-foot .cond-sm{
+  font-size:10.5px;font-weight:700;color:var(--text-dim);
+  padding:3px 8px;border-radius:6px;background:var(--glass-chip);
+}
+.mini-foot .price{
+  font-size:15px;font-weight:800;color:var(--accent);
+  font-variant-numeric:tabular-nums;
+}
+.mini-foot .price small{font-size:11px;font-weight:700;margin-right:1px;}
+/* 地址列表 */
+.addr-item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:18px 20px;border:1.5px solid var(--line);border-radius:16px;
+  margin-bottom:12px;transition:.25s;
+}
+.addr-item:hover{border-color:var(--line-mid);}
+.addr-item .info{flex:1;min-width:0;}
+.addr-item .info .who{
+  font-size:14.5px;font-weight:700;color:var(--text);margin:0 0 4px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.addr-item .info .who .tag{
+  font-size:10.5px;font-weight:700;color:var(--accent);
+  padding:2px 8px;border-radius:6px;background:var(--accent-bg);
+  border:1px solid rgba(53,107,74,.40);
+}
+.addr-item .info .detail{
+  font-size:13px;color:var(--text-dim);line-height:1.7;margin:0;
+}
+.addr-item .info .phone{
+  font-size:13px;color:var(--text-faint);margin:4px 0 0;
+  font-variant-numeric:tabular-nums;
+}
+.addr-actions{display:flex;gap:8px;flex:none;}
+.addr-actions button{
+  font-size:12.5px;font-weight:600;
+  padding:7px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--glass-strong);color:var(--text-dim);
+  transition:.25s;
+}
+.addr-actions button:hover{border-color:var(--text);color:var(--text);}
+/* 设置表单 */
+.setting-block{margin-bottom:30px;padding-bottom:30px;border-bottom:1px solid var(--line);}
+.setting-block:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0;}
+.setting-block h3{
+  font-size:16px;font-weight:800;margin:0 0 6px;letter-spacing:-0.01em;
+}
+.setting-block .hint{
+  font-size:13px;color:var(--text-faint);margin:0 0 18px;line-height:1.7;
+}
+.setting-row{
+  display:grid;grid-template-columns:140px 1fr auto;gap:14px;align-items:center;
+  padding:12px 0;
+}
+.setting-row .label{
+  font-size:13px;font-weight:600;color:var(--text-dim);
+}
+.setting-row .value{
+  font-size:14px;color:var(--text);font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+.setting-row .value.muted{color:var(--text-faint);font-weight:400;}
+.setting-row input{
+  width:100%;padding:11px 14px;border-radius:12px;
+  border:1.5px solid var(--line);background:var(--glass-soft);
+  font-size:14px;color:var(--text);outline:none;transition:.25s;
+}
+.setting-row input:focus{border-color:var(--accent);background:var(--glass-strong);}
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(20px);
+  background:var(--text);color:#fff;
+  font-size:13.5px;font-weight:600;
+  padding:13px 24px;border-radius:999px;
+  box-shadow:0 20px 40px -16px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:.35s;z-index:300;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* Footer */
+.site-footer-wrap{padding-bottom:32px;padding-top:32px;}
+.footer-brand p{max-width:320px;line-height:1.75;color:var(--text-faint);margin:0;}
+.footer-bottom span:last-child{font-weight:600;letter-spacing:.08em;}
+/* Responsive */
+@media (max-width:900px){
+  .nav{display:none;}
+  .profile-layout{grid-template-columns:1fr;}
+  .side-nav{
+    display:flex;gap:6px;overflow-x:auto;padding:10px;
+    scrollbar-width:none;
+  }
+  .side-nav::-webkit-scrollbar{display:none;}
+  .side-nav button{
+    flex:none;padding:10px 16px;white-space:nowrap;
+  }
+  .side-divider{display:none;}
+  .footer-inner{grid-template-columns:1fr;gap:42px;}
+  .site-footer{padding:48px 32px 0;}
+  .grid-cards{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:640px){
+  .container{width:calc(100% - 32px);}
+  .header-inner{padding:0 18px;}
+  .user-chip .name-sm{max-width:80px;}
+  .profile-head-inner{padding:28px 22px;}
+  .panel-body{padding:26px 22px;}
+  .profile-stats{grid-template-columns:repeat(2,1fr);}
+  .grid-cards{grid-template-columns:1fr;}
+  .setting-row{grid-template-columns:1fr;gap:8px;}
+  .footer-cols{grid-template-columns:1fr 1fr;}
+}
+</style>
+<link rel="stylesheet" href="theme-mist.css">
+<!-- 方案 B · 一页之间：出版物皮肤层（最后加载，覆盖以上所有样式） -->
+<link rel="stylesheet" href="spread.css">
+  <link rel="stylesheet" href="pt.css">
+  <script>(function(){try{var f=JSON.parse(sessionStorage.getItem("lumen_pt")||"null");if(f&&Date.now()-f.t<30000){document.documentElement.classList.add("pt-pending");setTimeout(function(){document.documentElement.classList.remove("pt-pending")},3000);}}catch(e){}})();</script>
+</head>
+<body>
+<div id="pt-panel" aria-hidden="true"></div>
+
+<!-- ==================== 个人中心头部 ==================== -->
+<section class="profile-head">
+  <div class="container">
+    <div class="surface profile-head-inner">
+
+      <div class="profile-top">
+        <span class="avatar-lg" id="bigAvatar">L</span>
+        <div class="who">
+          <h1 id="userName">
+            用户
+            <span class="verified">已登录</span>
+          </h1>
+          <p>
+            <span>账号 <b id="userAccount">—</b></span>
+            <span>注册于 <b id="userCreated">—</b></span>
+          </p>
+        </div>
+        <div class="profile-head-actions">
+          <a class="btn-ghost" href="market.html">去淘书 →</a>
+          <a class="btn-primary" href="sell.html">卖书</a>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat"><b id="statOrders">3</b><span>我的订单</span></div>
+        <div class="stat"><b id="statFavs">4</b><span>我的收藏</span></div>
+        <div class="stat"><b id="statLists">2</b><span>我的书单</span></div>
+        <div class="stat"><b id="statAddr">2</b><span>收货地址</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 主体 ==================== -->
+<section class="container">
+  <div class="profile-layout">
+
+    <!-- 侧栏 -->
+    <aside class="surface side-nav" id="sideNav">
+      <button class="active" data-tab="orders" type="button">
+        <svg viewBox="0 0 24 24"><path d="M3 7h18v12H3z"/><path d="M3 7l3-4h12l3 4"/></svg>
+        我的订单
+        <span class="badge" id="navOrdersBadge">3</span>
+      </button>
+      <button data-tab="favs" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>
+        我的收藏
+        <span class="badge" id="navFavsBadge">4</span>
+      </button>
+      <button data-tab="lists" type="button">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M4 14h16"/></svg>
+        我的书单
+      </button>
+      <button data-tab="address" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>
+        收货地址
+      </button>
+      <div class="side-divider"></div>
+      <button data-tab="settings" type="button">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4.9a7 7 0 0 0-2-1.2L14 2h-4l-.5 2.5a7 7 0 0 0-2 1.2L5.1 4.8 3 8.2l2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-.9a7 7 0 0 0 2 1.2L10 22h4l.5-2.5a7 7 0 0 0 2-1.2l2.4.9 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>
+        账号设置
+      </button>
+    </aside>
+
+    <!-- 内容 -->
+    <div class="surface panel-body" id="panelBody">
+
+      <!-- 订单 -->
+      <div class="panel-view" data-view="orders">
+        <div class="panel-head">
+          <div>
+            <h2>我的订单</h2>
+            <p>买书、卖书、回收订单都在这里。演示数据。</p>
+          </div>
+          <a class="btn-ghost" href="market.html">继续逛 →</a>
+        </div>
+
+        <!-- 真实下单的订单（checkout.html 写入 lumen_orders）插在这里 -->
+        <div id="savedOrders"></div>
+
+        <div class="order">
+          <div class="order-top">
+            <span class="no">订单号 LM20260914-0012</span>
+            <span class="status shipping">待收货</span>
+          </div>
+          <div class="order-body">
+            <span class="cover-sm" style="--book-bg:#111111;"></span>
+            <div class="info">
+              <h4>置身事内：中国政府与经济发展</h4>
+              <p>卖家 林清和 · 上海 · 包邮 · 下单于 09-12</p>
+            </div>
+            <span class="price"><small>¥</small>18</span>
+          </div>
+          <div class="order-foot">
+            <button type="button">查看物流</button>
+            <button type="button" class="primary" data-action="confirm">确认收货</button>
+          </div>
+        </div>
+
+        <div class="order">
+          <div class="order-top">
+            <span class="no">订单号 LM20260910-0087</span>
+            <span class="status paid">待发货</span>
+          </div>
+          <div class="order-body">
+            <span class="cover-sm" style="--book-bg:#A1DB67;"></span>
+            <div class="info">
+              <h4>百年孤独</h4>
+              <p>卖家 周砚辞 · 成都 · 运费 ¥6 · 下单于 09-10</p>
+            </div>
+            <span class="price"><small>¥</small>12</span>
+          </div>
+          <div class="order-foot">
+            <button type="button">联系卖家</button>
+            <button type="button">申请退款</button>
+          </div>
+        </div>
+
+        <div class="order">
+          <div class="order-top">
+            <span class="no">回收单号 LM-R-20260908-0341</span>
+            <span class="status done">已完成</span>
+          </div>
+          <div class="order-body">
+            <span class="cover-sm" style="--book-bg:#c0c0c0;"></span>
+            <div class="info">
+              <h4>瓦尔登湖 · 九五新</h4>
+              <p>平台回收 · 09-08 提交 · 09-09 已打款</p>
+            </div>
+            <span class="price"><small>¥</small>15</span>
+          </div>
+          <div class="order-foot">
+            <button type="button">查看回收单</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 收藏 -->
+      <div class="panel-view" data-view="favs" style="display:none;">
+        <div class="panel-head">
+          <div>
+            <h2>我的收藏</h2>
+            <p>收藏的书与书单。有货会提醒你。</p>
+          </div>
+        </div>
+
+        <div class="grid-cards" id="favsGrid"></div>
+      </div>
+
+      <!-- 书单 -->
+      <div class="panel-view" data-view="lists" style="display:none;">
+        <div class="panel-head">
+          <div>
+            <h2>我的书单</h2>
+            <p>你创建与收藏的书单。</p>
+          </div>
+          <a class="btn-primary" href="lists.html">浏览书单广场 →</a>
+        </div>
+
+        <div class="grid-cards">
+          <article class="mini-card" onclick="location.href='lists.html?id=1'">
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <span class="mini-cover" style="--book-bg:#111111;width:33%;margin:0;aspect-ratio:3/4.2;" data-cover="zhishenshizheng"></span>
+              <span class="mini-cover" style="--book-bg:#c0c0c0;width:33%;margin:0;aspect-ratio:3/4.2;" data-cover="waerdeng"></span>
+              <span class="mini-cover" style="--book-bg:#A1DB67;width:33%;margin:0;aspect-ratio:3/4.2;" data-cover="bainiangudu"></span>
+            </div>
+            <h4>通识经典 · 认识世界的 12 种方式</h4>
+            <p class="meta">12 本 · 1.2k 人收藏</p>
+            <div class="mini-foot">
+              <span class="cond-sm">我收藏的</span>
+              <span class="price">12 本</span>
+            </div>
+          </article>
+          <article class="mini-card" onclick="location.href='lists.html?id=2'">
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <span class="mini-cover" style="--book-bg:#A1DB67;width:33%;margin:0;aspect-ratio:3/4.2;" data-cover="beitaoyan"></span>
+              <span class="mini-cover" style="--book-bg:#c0c0c0;width:33%;margin:0;aspect-ratio:3/4.2;" data-cover="shehuixue"></span>
+              <span class="mini-cover" style="--book-bg:#111111;width:33%;margin:0;aspect-ratio:3/4.2;" data-cover="xiangtu"></span>
+            </div>
+            <h4>写给年轻人的心理学入门</h4>
+            <p class="meta">9 本 · 986 人收藏</p>
+            <div class="mini-foot">
+              <span class="cond-sm">我收藏的</span>
+              <span class="price">9 本</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- 地址 -->
+      <div class="panel-view" data-view="address" style="display:none;">
+        <div class="panel-head">
+          <div>
+            <h2>收货地址</h2>
+            <p>下单时默认使用这里的地址。</p>
+          </div>
+          <button class="btn-primary" type="button" id="addAddrBtn">新增地址</button>
+        </div>
+
+        <div class="addr-item">
+          <div class="info">
+            <p class="who">
+              林清和
+              <span class="tag">默认</span>
+            </p>
+            <p class="detail">上海市 · 杨浦区 · XX 路 100 号 XX 大学 XX 宿舍楼 3 楼 305</p>
+            <p class="phone">138 **** 8888</p>
+          </div>
+          <div class="addr-actions">
+            <button type="button">编辑</button>
+          </div>
+        </div>
+
+        <div class="addr-item">
+          <div class="info">
+            <p class="who">林清和（家）</p>
+            <p class="detail">北京市 · 海淀区 · XX 路 66 号 XX 小区 8 栋 502</p>
+            <p class="phone">138 **** 8888</p>
+          </div>
+          <div class="addr-actions">
+            <button type="button">编辑</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置 -->
+      <div class="panel-view" data-view="settings" style="display:none;">
+        <div class="panel-head">
+          <div>
+            <h2>账号设置</h2>
+            <p>管理你的账号与密码。</p>
+          </div>
+        </div>
+
+        <div class="setting-block">
+          <h3>账号信息</h3>
+          <p class="hint">手机号或邮箱，登录时使用。</p>
+          <div class="setting-row">
+            <span class="label">当前账号</span>
+            <span class="value" id="setAccount">—</span>
+            <span></span>
+          </div>
+          <div class="setting-row">
+            <span class="label">账号类型</span>
+            <span class="value" id="setType">—</span>
+            <span></span>
+          </div>
+          <div class="setting-row">
+            <span class="label">注册时间</span>
+            <span class="value muted" id="setCreated">—</span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="setting-block">
+          <h3>修改密码</h3>
+          <p class="hint">输入当前密码与新密码，修改后立即生效。</p>
+          <div class="setting-row">
+            <span class="label">当前密码</span>
+            <input type="password" id="curPwd" placeholder="请输入当前密码">
+            <span></span>
+          </div>
+          <div class="setting-row">
+            <span class="label">新密码</span>
+            <input type="password" id="newPwd" placeholder="6–20 位">
+            <span></span>
+          </div>
+          <div class="setting-row">
+            <span class="label">确认新密码</span>
+            <input type="password" id="newPwd2" placeholder="再输入一次">
+            <span></span>
+          </div>
+          <div class="setting-row">
+            <span class="label"></span>
+            <div>
+              <button class="btn-primary" type="button" id="changePwdBtn">保存新密码</button>
+            </div>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="setting-block">
+          <h3>退出登录</h3>
+          <p class="hint">退出后需重新登录，收藏与订单不会丢失。</p>
+          <button class="btn-ghost" type="button" id="logoutBtn2">退出登录</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ==================== Footer ==================== -->
+<div class="site-footer-wrap">
+  <footer class="site-footer container">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <a class="logo" href="index.html">
+          <span class="logo-mark">L</span>
+          <span class="logo-text">
+            <b>LUMEN</b>
+            <em>Books</em>
+          </span>
+        </a>
+        <p>大学生二手书流转平台 · 扫码卖书 · 按品相定价 · 担保交易。<br>让每一本旧书遇见下一位读者。</p>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <h5>Discover</h5>
+          <a href="lists.html">书单</a>
+          <a href="market.html">淘书</a>
+          <a href="reviews.html#wantedSection">寻书</a>
+          <a href="reviews.html">书话</a>
+        </div>
+        <div>
+          <h5>Service</h5>
+          <a href="sell.html">卖书</a>
+          <a href="sell.html#rules">回收规则</a>
+          <a href="#">交易担保</a>
+          <a href="#">售后仲裁</a>
+        </div>
+        <div>
+          <h5>About</h5>
+          <a href="#">平台规则</a>
+          <a href="#">联系我们</a>
+          <a href="#">使用条款</a>
+          <a href="#">隐私说明</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LUMEN BOOKS · 仅用于学习交流</span>
+      <span>Reading makes us meet.</span>
+    </div>
+  </footer>
+</div>
+
+<script src="store.js"></script>
+<script>
+/* ============================================================
+   登录态校验
+   ============================================================ */
+const USER_KEY = 'lumen_users';
+const SESSION_KEY = 'lumen_session';
+
+function loadUsers(){
+  try { return JSON.parse(localStorage.getItem(USER_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function loadSession(){
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; }
+  catch(e){ return null; }
+}
+function saveUsers(u){
+  localStorage.setItem(USER_KEY, JSON.stringify(u));
+}
+
+const session = loadSession();
+if (!session || !session.account) {
+  location.replace('login.html');
+}
+
+/* 未登录时会跳转，这里用空账号兜底，避免后续渲染抛错 */
+const account = (session && session.account) || '';
+const users = loadUsers();
+const me = users[account];
+
+/* ---------- 渲染用户信息 ---------- */
+function maskAccount(s){
+  if (/^1[3-9]\d{9}$/.test(s)) {
+    return s.slice(0, 3) + ' **** ' + s.slice(7);
+  }
+  const [name, domain] = s.split('@');
+  if (!domain) return s;
+  const head = name.length <= 2 ? name[0] + '*' : name.slice(0, 2) + '***';
+  return head + '@' + domain;
+}
+function accountType(s){
+  if (/^1[3-9]\d{9}$/.test(s)) return '手机号';
+  return '邮箱';
+}
+function displayName(s){
+  if (/^1[3-9]\d{9}$/.test(s)) return '书友 ' + s.slice(-4);
+  return s.split('@')[0];
+}
+function formatDate(ts){
+  const d = new Date(ts);
+  return d.getFullYear() + '-' +
+         String(d.getMonth() + 1).padStart(2, '0') + '-' +
+         String(d.getDate()).padStart(2, '0');
+}
+
+const name = displayName(account);
+const firstChar = name.trim().charAt(0).toUpperCase() || 'L';
+
+document.getElementById('bigAvatar').textContent  = firstChar;
+document.getElementById('userName').innerHTML     = name + ' <span class="verified">已登录</span>';
+document.getElementById('userAccount').textContent = maskAccount(account);
+document.getElementById('userCreated').textContent = me ? formatDate(me.createdAt) : '—';
+
+document.getElementById('setAccount').textContent = account;
+document.getElementById('setType').textContent    = accountType(account);
+document.getElementById('setCreated').textContent = me ? formatDate(me.createdAt) : '—';
+
+/* ============================================================
+   本地数据：收藏（store.js lumen_fav）/ 订单（lumen_orders）/ 地址
+   ============================================================ */
+function readLS(key, def){
+  try { const v = JSON.parse(localStorage.getItem(key)); return v == null ? def : v; }
+  catch (e) { return def; }
+}
+
+const DEMO_ORDERS = 3;   // 页面上预置的 3 条演示订单
+const DEMO_ADDR   = 2;   // 页面上预置的 2 条演示地址
+const DEMO_LISTS  = 2;   // 页面上预置的 2 份书单
+
+let favIds = readLS('lumen_fav', []);
+favIds = Array.isArray(favIds) ? favIds : [];
+
+/* ---------- 统计数字：真实数据 + 演示数据的基数 ---------- */
+function refreshStats(){
+  const orders = readLS('lumen_orders', []);
+  const addr   = readLS('lumen_addr', []);
+
+  document.getElementById('statOrders').textContent = DEMO_ORDERS + orders.length;
+  document.getElementById('statFavs').textContent   = favIds.length;
+  document.getElementById('statLists').textContent  = DEMO_LISTS;
+  document.getElementById('statAddr').textContent   = addr.length || DEMO_ADDR;
+
+  document.getElementById('navOrdersBadge').textContent = DEMO_ORDERS + orders.length;
+  document.getElementById('navFavsBadge').textContent   = favIds.length;
+}
+
+/* ---------- 收藏 Tab：按 store.js 的目录动态渲染 ---------- */
+function renderFavs(){
+  const box = document.getElementById('favsGrid');
+  if (!box) return;
+
+  const list = readLS('lumen_fav', []);
+  if (!Array.isArray(list) || list.length === 0) {
+    box.innerHTML =
+      '<div class="empty" style="grid-column:1/-1;">' +
+        '<b>还没有收藏。</b>' +
+        '去 <a href="market.html" style="color:var(--accent);font-weight:700;">淘书</a> 点封面右上角的 ★ 收藏喜欢的书。' +
+      '</div>';
+    return;
+  }
+
+  box.innerHTML = list.map(function(id){
+    const b = Store.getBook(id);
+    if (!b) return '';
+    return '<article class="mini-card" data-book-id="' + id + '">' +
+      '<span class="mini-cover" style="--book-bg:' + b.bg + ';" data-cover="' + id + '"></span>' +
+      '<h4>' + b.title + '</h4>' +
+      '<p class="meta">' + b.author + (b.pub ? ' · ' + String(b.pub).split(' · ')[0] : '') + '</p>' +
+      '<div class="mini-foot">' +
+        '<span class="cond-sm">' + b.cat + '</span>' +
+        '<span class="price"><small>¥</small>' + b.price + '</span>' +
+      '</div>' +
+    '</article>';
+  }).join('');
+  Store.applyCovers(box);
+
+  box.querySelectorAll('.mini-card[data-book-id]').forEach(card => {
+    card.addEventListener('click', () => {
+      location.href = 'book.html?id=' + card.dataset.bookId;
+    });
+  });
+}
+
+/* ---------- 订单 Tab：把本地新建的订单插到演示订单之前 ---------- */
+function renderOrders(){
+  const box = document.getElementById('savedOrders');
+  if (!box) return;
+
+  const list = readLS('lumen_orders', []);
+  if (!Array.isArray(list) || list.length === 0) { box.innerHTML = ''; return; }
+
+  box.innerHTML = list.map(function(o){
+    const b = Store.getBook(o.bookId) || { title: '二手书', bg: '#111111' };
+    const d = new Date(o.date || Date.now());
+    const dateStr = String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const status = o.status || '待发货';
+    const statusCls = status === '已完成' ? 'done' : (status === '待收货' ? 'shipping' : 'paid');
+
+    return '<div class="order">' +
+      '<div class="order-top">' +
+        '<span class="no">订单号 ' + o.no + '</span>' +
+        '<span class="status ' + statusCls + '">' + status + '</span>' +
+      '</div>' +
+      '<div class="order-body">' +
+        '<span class="cover-sm" style="--book-bg:' + b.bg + (b.cover ? ';" data-cover="' + o.bookId + '"' : '') + '></span>' +
+        '<div class="info">' +
+          '<h4>' + b.title + '</h4>' +
+          '<p>数量 ×' + (o.qty || 1) + ' · 合计 ¥' + o.total + ' · 下单于 ' + dateStr + '</p>' +
+        '</div>' +
+        '<span class="price"><small>¥</small>' + o.total + '</span>' +
+      '</div>' +
+      '<div class="order-foot">' +
+        '<button type="button">查看物流</button>' +
+        '<button type="button" class="primary" data-action="confirm">确认收货</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  Store.applyCovers(box);
+}
+
+refreshStats();
+renderFavs();
+renderOrders();
+
+/* ---------- Tab 切换 ---------- */
+const sideNav = document.getElementById('sideNav');
+const panelBody = document.getElementById('panelBody');
+
+function switchView(tab){
+  sideNav.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  panelBody.querySelectorAll('.panel-view').forEach(v => {
+    v.style.display = v.dataset.view === tab ? '' : 'none';
+  });
+  // 更新 URL 但不刷新
+  const url = new URL(location.href);
+  url.searchParams.set('tab', tab);
+  history.replaceState(null, '', url);
+}
+
+sideNav.addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  switchView(btn.dataset.tab);
+});
+
+/* 支持 ?tab=xxx */
+const initTab = new URLSearchParams(location.search).get('tab');
+if (initTab) switchView(initTab);
+
+/* ---------- Toast ---------- */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+/* ---------- 订单操作（事件委托，兼容动态生成的订单） ---------- */
+panelBody.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-action="confirm"]');
+  if (!btn) return;
+  const order = btn.closest('.order');
+  if (!order) return;
+  const status = order.querySelector('.status');
+  status.textContent = '已完成';
+  status.className = 'status done';
+  btn.closest('.order-foot').innerHTML =
+    '<button type="button">评价</button><button type="button">再买一次</button>';
+  toast('已确认收货');
+});
+
+/* ---------- 收藏卡片点击 → 详情（由 renderFavs 动态绑定） ---------- */
+
+/* ---------- 新增地址（演示） ---------- */
+document.getElementById('addAddrBtn').addEventListener('click', () => {
+  toast('演示阶段：地址新增表单待开发');
+});
+
+/* ---------- 修改密码 ---------- */
+document.getElementById('changePwdBtn').addEventListener('click', () => {
+  const cur = document.getElementById('curPwd').value;
+  const n1  = document.getElementById('newPwd').value;
+  const n2  = document.getElementById('newPwd2').value;
+
+  if (!cur) { toast('请输入当前密码'); return; }
+  if (!me || me.password !== cur) { toast('当前密码不正确'); return; }
+  if (n1.length < 6 || n1.length > 20) { toast('新密码需 6–20 位'); return; }
+  if (n1 !== n2) { toast('两次输入的新密码不一致'); return; }
+
+  users[account].password = n1;
+  saveUsers(users);
+  document.getElementById('curPwd').value = '';
+  document.getElementById('newPwd').value = '';
+  document.getElementById('newPwd2').value = '';
+  toast('密码已修改');
+});
+
+/* ---------- 退出登录 ---------- */
+function logout(){
+  localStorage.removeItem(SESSION_KEY);
+  toast('已退出登录');
+  setTimeout(() => location.href = 'login.html', 600);
+}
+document.getElementById('logoutBtn2').addEventListener('click', logout);
+
+
+</script>
+
+<script src="dock.js"></script>
+<!-- 方案 B · 一页之间：书签绸带 + 跨页刊头 -->
+<script src="spread.js"></script>
+  <script src="pt.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>书单 · LUMEN BOOKS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="common.css">
+<style>
+button{font-family:inherit;cursor:pointer;}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:32px;margin-bottom:32px;
+}
+.section-head h2{
+  font-size:clamp(26px,3vw,38px);font-weight:800;line-height:1.15;
+  margin:0 0 10px;letter-spacing:-0.02em;color:var(--text);
+}
+.section-desc{color:var(--text-dim);max-width:560px;margin:0;font-size:15px;line-height:1.7;}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1.5px solid var(--line);color:var(--text);
+  background:var(--glass-strong);font-size:14px;font-weight:600;
+  padding:14px 28px;border-radius:999px;transition:.25s;
+}
+.icon-btn{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line);background:var(--glass-strong);
+  display:grid;place-items:center;transition:.25s;
+}
+/* Page head */
+.page-head{padding:16px 0 8px;}
+.page-head-inner{padding:36px 40px;}
+.breadcrumb{
+  font-size:12.5px;color:var(--text-faint);
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+}
+.breadcrumb a{transition:.25s;}
+.breadcrumb a:hover{color:var(--accent);}
+.breadcrumb .sep{opacity:.5;}
+.page-title{
+  font-size:clamp(26px,3vw,36px);font-weight:800;
+  margin:0 0 8px;letter-spacing:-0.02em;color:var(--text);
+}
+.page-sub{color:var(--text-dim);margin:0;font-size:14.5px;max-width:680px;line-height:1.7;}
+.page-sub b{color:var(--text);font-weight:600;}
+/* ============================================================
+   书单广场：卡片网格
+   ============================================================ */
+.list-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  padding:16px 0 32px;
+}
+.list-card h3{
+  position:relative;z-index:1;
+  font-size:19px;font-weight:700;line-height:1.45;
+  margin:0 0 10px;letter-spacing:-0.01em;color:var(--text);transition:color .25s;
+}
+.list-card p{
+  position:relative;z-index:1;color:var(--text-dim);
+  font-size:14px;margin:0 0 24px;flex:1;line-height:1.65;
+}
+/* ============================================================
+   书单详情：书目列表
+   ============================================================ */
+.detail-wrap{padding:16px 0 32px;}
+.detail-hero{padding:40px 44px;display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center;}
+.detail-hero .list-meta{display:flex;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+.detail-hero .covers{display:flex;align-items:center;}
+.detail-hero .covers .mini{width:52px;}
+.detail-hero .covers .mini + .mini{margin-left:-16px;}
+.detail-hero h1{
+  font-size:clamp(26px,3.2vw,40px);font-weight:800;
+  margin:0 0 12px;letter-spacing:-0.02em;color:var(--text);line-height:1.15;
+}
+.detail-hero .desc{color:var(--text-dim);margin:0 0 22px;font-size:15px;line-height:1.75;max-width:620px;}
+.detail-stats{
+  display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  font-size:13px;color:var(--text-faint);
+}
+.detail-stats b{color:var(--text);font-weight:700;font-size:15px;display:block;line-height:1.2;}
+.detail-stats .stat{display:flex;flex-direction:column;gap:3px;}
+.detail-stats .stat span{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;}
+.detail-actions{display:flex;flex-direction:column;gap:12px;min-width:220px;}
+.detail-actions .btn-primary,
+.detail-actions .btn-ghost{justify-content:center;}
+/* 书目列表 */
+.book-rows{padding:12px 0 32px;}
+.row-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 44px;border-bottom:1px solid var(--line);
+}
+.row-head h3{
+  font-size:15px;font-weight:800;margin:0;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:10px;
+}
+.row-head h3::before{
+  content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;
+}
+.row-head .row-hint{font-size:12.5px;color:var(--text-faint);}
+.book-row{
+  display:grid;
+  grid-template-columns:56px 1fr auto auto;
+  align-items:center;gap:22px;
+  padding:20px 44px;border-bottom:1px solid var(--line);
+  transition:background .25s;
+}
+.book-row:last-child{border-bottom:0;}
+.book-row:hover{background:rgba(0,0,0,.015);}
+.row-idx{
+  font-size:13px;color:var(--text-faint);font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.row-cover{
+  width:56px;aspect-ratio:3/4.2;border-radius:5px;flex:none;
+  background:var(--book-bg,#111);
+  box-shadow:0 10px 20px -14px rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.18);
+  position:relative;overflow:hidden;
+  grid-row:1 / 3;
+}
+.row-cover::before{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:5px;
+  background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(0,0,0,.25));
+}
+.row-info{min-width:0;grid-column:2;}
+.row-info h4{
+  font-size:16px;font-weight:700;margin:0 0 4px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:color .25s;
+}
+.book-row:hover .row-info h4{color:var(--accent);}
+.row-info p{font-size:13px;color:var(--text-dim);margin:0;}
+.row-info .note{
+  margin-top:6px;font-size:12.5px;color:var(--text-faint);line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.row-status{
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+  min-width:120px;
+}
+.row-status .price{
+  font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-0.02em;
+}
+.row-status .price small{font-size:12px;font-weight:700;margin-right:1px;}
+.row-status .sub{font-size:11.5px;color:var(--text-faint);}
+.row-status .sold-out{font-size:12px;color:var(--text-faint);font-weight:600;}
+.row-cta{display:flex;gap:8px;}
+.row-cta a{
+  font-size:13px;font-weight:600;padding:9px 16px;border-radius:12px;
+  border:1.5px solid var(--line);background:var(--glass-strong);color:var(--text);
+  transition:.25s;white-space:nowrap;
+}
+.row-cta a:hover{border-color:var(--text);}
+.row-cta a.primary{
+  background:var(--text);color:#fff;border-color:var(--text);
+}
+.row-cta a.primary:hover{background:var(--accent);border-color:var(--accent);}
+/* 空状态 */
+.empty{
+  padding:80px 24px;text-align:center;color:var(--text-faint);
+}
+.empty h3{font-size:18px;color:var(--text);margin:0 0 8px;font-weight:700;}
+.empty p{font-size:14px;margin:0 0 20px;}
+.footer-brand p{max-width:320px;line-height:1.75;color:var(--text-faint);margin:0;}
+.footer-bottom span:last-child{font-weight:600;letter-spacing:.08em;}
+/* Responsive */
+@media (max-width:1080px){
+  .list-grid{grid-template-columns:repeat(2,1fr);}
+  .book-row{grid-template-columns:48px 1fr auto;gap:16px;padding:18px 28px;}
+  .row-head{padding:18px 28px;}
+  .row-cta{grid-column:2 / 4;justify-content:flex-end;margin-top:6px;}
+}
+@media (max-width:900px){
+  .nav{display:none;}
+  .detail-hero{grid-template-columns:1fr;padding:32px 28px;}
+  .detail-actions{flex-direction:row;flex-wrap:wrap;min-width:0;}
+  .footer-inner{grid-template-columns:1fr;gap:42px;}
+  .site-footer{padding:48px 32px 0;}
+}
+@media (max-width:640px){
+  .container{width:calc(100% - 32px);}
+  .header-inner{padding:0 18px;}
+  .list-grid{grid-template-columns:1fr;}
+  .page-head-inner{padding:28px 22px;}
+  .book-row{grid-template-columns:1fr;padding:20px 22px;gap:14px;}
+  .row-cover{grid-row:auto;}
+  .row-status{align-items:flex-start;min-width:0;}
+  .row-cta{grid-column:auto;justify-content:flex-start;}
+  .row-head{padding:16px 22px;}
+  .footer-cols{grid-template-columns:1fr 1fr;}
+}
+
+/* ============================================================
+   精装硬壳书 —— 书单广场的开场场景
+   3D 书本（书脊 + 米白内页 + 深绿封面沿书脊翻开）+ 6 个话题纸签浮点
+   （入场错峰 + 呼吸浮动）+ 原地速览卡片（统计 / 前 4 本书 / 直达详情）。
+   配色接入全站变量（--accent 深绿），≤639px 时纸签换行、卡片居中弹层。
+   ============================================================ */
+/* 互动舞台：书本居左，右侧留给纸签云与速览卡片 */
+.book-wrap{ position:relative; }
+
+.book-interactive-wrapper{
+  position:relative;
+  width:100%;
+  min-height:440px;
+  margin:26px auto 8px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:26px 20px 34px;
+  box-sizing:border-box;
+}
+
+/* ---------------- 3D 书本造型与翻页 ---------------- */
+.book-3d-container{
+  position:relative;
+  width:180px;height:250px;
+  perspective:1400px;
+  cursor:pointer;
+  user-select:none;
+  z-index:10;
+  margin-left:clamp(48px,7vw,96px);   /* 左侧留出让翻开封面摆出的空间 */
+  outline:none;
+  flex:none;
+}
+.book-spine{
+  position:absolute;left:0;top:0;width:10px;height:100%;
+  background:var(--accent-hover,#16432d);
+  border-radius:3px 0 0 3px;
+  z-index:5;
+}
+/* 米白内页 */
+.book-page-back{
+  position:absolute;left:5px;top:3px;width:172px;height:244px;
+  background:#faf8f3;
+  border:1px solid #e2ded4;
+  border-radius:0 4px 4px 0;
+  box-shadow:inset 8px 0 12px rgba(0,0,0,.06);
+  padding:20px 15px;box-sizing:border-box;
+}
+.page-content{display:flex;flex-direction:column;height:100%;}
+.page-eyebrow{font-size:10px;color:var(--accent);letter-spacing:1px;}
+.page-title-sm{font-size:18px;color:var(--text);margin:6px 0 4px;font-weight:800;line-height:1.25;}
+.page-line{width:24px;height:2px;background:var(--accent);margin-bottom:12px;}
+.page-desc{font-size:11px;color:var(--text-dim);line-height:1.5;}
+/* 封面（以左书脊为轴旋转翻开） */
+.book-cover-front{
+  position:absolute;left:5px;top:0;width:175px;height:250px;
+  background:var(--accent);
+  border-radius:0 5px 5px 0;
+  transform-origin:left center;
+  transform-style:preserve-3d;
+  transition:transform .6s ease-in-out, box-shadow .6s ease-in-out;
+  box-shadow:4px 6px 15px rgba(0,0,0,.18);
+  z-index:6;
+  display:flex;align-items:center;justify-content:center;
+}
+.cover-content{text-align:center;color:#F7F4EC;}
+.cover-title{font-size:26px;font-weight:800;letter-spacing:2px;display:block;}
+.cover-deco-line{width:36px;height:2px;background:#F7F4EC;margin:10px auto;opacity:.8;}
+.cover-sub{font-size:9px;letter-spacing:1.5px;opacity:.7;}
+.book-3d-container.is-open .book-cover-front{
+  transform:rotateY(-152deg);
+  box-shadow:-6px 6px 15px rgba(0,0,0,.12);
+}
+.book-shadow{
+  position:absolute;bottom:-15px;left:10px;width:160px;height:15px;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,.2) 0%, rgba(0,0,0,0) 70%);
+  transition:opacity .6s ease;
+}
+
+/* ---------------- 话题浮点（纸签） ---------------- */
+.floating-tags-container{
+  position:absolute;
+  left:300px;top:0;right:0;bottom:0;
+  z-index:20;                 /* 压在翻开的封面上方 */
+  pointer-events:none;
+}
+.tag-float-item{
+  position:absolute;
+  pointer-events:auto;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:6px 14px 6px 10px;
+  display:flex;align-items:center;gap:8px;
+  max-width:180px;                 /* 限宽：≤列距，配合网格保证互不遮挡 */
+  box-shadow:0 4px 12px rgba(0,0,0,.05);
+  cursor:pointer;
+  opacity:0;
+  transform:scale(.3);
+  /* 弹跳入场：回弹缓动 + 缩放，入场后转入呼吸浮动 */
+  transition:opacity .3s ease var(--dly-in,0s),
+             transform .5s cubic-bezier(.34,1.56,.64,1) var(--dly-in,0s),
+             border-color .2s ease, box-shadow .2s ease;
+  user-select:none;
+}
+.book-interactive-wrapper.is-expanded .tag-float-item{
+  opacity:1;
+  transform:scale(1);
+}
+.tag-float-item:hover{
+  border-color:var(--accent);
+  box-shadow:0 6px 16px rgba(53,107,74,.15);
+}
+.tag-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.tag-text-wrap{display:flex;align-items:baseline;gap:6px;}
+.tag-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;}
+.tag-count{font-size:11px;color:var(--text-dim);white-space:nowrap;}
+/* 呼吸动画用 translate 属性，不干扰定位 transform */
+@keyframes tagFloatBreathe{
+  0%,100%{translate:0 0;}
+  50%{translate:0 -3px;}
+}
+.book-interactive-wrapper.is-expanded .tag-float-item.breathe-active{
+  animation:tagFloatBreathe 3.8s ease-in-out infinite;
+}
+/* 卡片打开时，其余纸签淡出 */
+.book-interactive-wrapper.has-active-card .tag-float-item:not(.is-active-tag){
+  opacity:.22 !important;
+  pointer-events:none;
+}
+
+/* ---------------- 原地速览卡片 ---------------- */
+.preview-card-popover{
+  position:absolute;
+  top:10px;left:280px;
+  width:min(380px, calc(100% - 250px));
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.12);
+  padding:20px;box-sizing:border-box;
+  z-index:100;
+  opacity:0;
+  transform:scale(.94);
+  transform-origin:left top;
+  transition:opacity .3s cubic-bezier(.175,.885,.32,1.275), transform .3s cubic-bezier(.175,.885,.32,1.275);
+  pointer-events:none;
+}
+.preview-card-popover:not([hidden]){
+  opacity:1;
+  transform:scale(1);
+  pointer-events:auto;
+}
+.card-close-btn{
+  position:absolute;top:12px;right:14px;
+  background:none;border:none;font-size:16px;
+  color:var(--text-dim);cursor:pointer;padding:4px;
+}
+.card-close-btn:hover{color:var(--text);}
+.card-eyebrow{font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.card-title{font-size:16px;color:var(--text);margin:4px 0 6px;font-weight:700;}
+.card-desc{font-size:12px;color:var(--text-dim);line-height:1.4;margin:0 0 6px;}
+.card-curator{font-size:11px;color:#888;margin-bottom:12px;}
+.card-stats-row{
+  display:flex;justify-content:space-between;
+  background:var(--surface-muted,#F7F4EC);
+  border-radius:6px;padding:8px 10px;margin-bottom:12px;
+}
+.stat-item{text-align:center;}
+.stat-val{font-size:13px;font-weight:700;color:var(--accent);display:block;}
+.stat-lbl{font-size:10px;color:var(--text-dim);}
+.preview-hd{font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.preview-book-list{
+  list-style:none;padding:0;margin:0;
+  display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;
+}
+.preview-book-item{
+  font-size:11px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.more-books-hint{font-size:10px;color:#999;margin-top:6px;text-align:right;}
+.card-footer{margin-top:14px;}
+.view-full-btn{
+  display:block;width:100%;text-align:center;
+  background:var(--accent);color:#fff;
+  text-decoration:none;padding:8px 0;border-radius:6px;
+  font-size:13px;font-weight:500;
+  transition:background .2s ease;
+}
+.view-full-btn:hover{background:var(--accent-hover);}
+
+/* #squareGrid 卡片网格保留在 DOM（renderSquare / 卡片点击仍引用它），仅视觉上隐藏 */
+#squareGrid{ display:none; }
+
+/* ---------------- 移动端 (≤639px) ---------------- */
+@media (max-width:639px){
+  .book-interactive-wrapper{
+    flex-direction:column;
+    align-items:flex-start;
+    min-height:360px;
+    padding:10px;
+  }
+  .book-3d-container{width:150px;height:210px;margin-left:10px;}
+  .book-page-back{width:142px;height:204px;}
+  .book-cover-front{width:145px;height:210px;}
+  .floating-tags-container{
+    position:relative;
+    left:0;top:15px;width:100%;height:auto;
+    display:flex;flex-wrap:wrap;gap:8px;
+  }
+  .tag-float-item{
+    position:relative !important;
+    top:auto !important;left:auto !important;
+    max-width:128px;
+    padding:4px 8px;
+  }
+  .tag-title{font-size:11px;overflow:hidden;text-overflow:ellipsis;}
+  .preview-card-popover{
+    position:fixed;
+    top:50%;left:50%;
+    width:min(380px, calc(100vw - 32px));
+    transform:translate(-50%,-50%) scale(.94);
+    transform-origin:center center;
+  }
+  .preview-card-popover:not([hidden]){
+    transform:translate(-50%,-50%) scale(1);
+  }
+}
+
+/* ---------------- 减少动效 ---------------- */
+@media (prefers-reduced-motion: reduce){
+  .book-cover-front,
+  .tag-float-item,
+  .preview-card-popover{
+    transition:none !important;
+    animation:none !important;
+  }
+}
+</style>
+<link rel="stylesheet" href="nav-ball.css">
+<link rel="stylesheet" href="theme-mist.css">
+<!-- 方案 B · 一页之间：出版物皮肤层（最后加载，覆盖以上所有样式） -->
+<link rel="stylesheet" href="spread.css">
+  <link rel="stylesheet" href="pt.css">
+  <script>(function(){try{var f=JSON.parse(sessionStorage.getItem("lumen_pt")||"null");if(f&&Date.now()-f.t<30000){document.documentElement.classList.add("pt-pending");setTimeout(function(){document.documentElement.classList.remove("pt-pending")},3000);}}catch(e){}})();</script>
+</head>
+<body>
+<div id="pt-panel" aria-hidden="true"></div>
+
+
+<!-- ==================== 书单广场（默认视图） ==================== -->
+<section class="page-head" id="viewSquare">
+  <div class="container">
+    <div class="surface page-head-inner">
+
+      <div class="breadcrumb">
+        <a href="index.html">首页</a>
+        <span class="sep">/</span>
+        <span>书单</span>
+      </div>
+
+      <h1 class="page-title">书单</h1>
+      <p class="page-sub">
+        按主题精选成单。点开一份，顺着读下去。
+      </p>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 3D 书本 + 话题纸签 + 速览卡片（书单广场开场场景） ==================== -->
+<section class="container">
+  <div class="book-wrap" id="bookWrap">
+    <div class="book-interactive-wrapper" id="bookInteractiveWrapper">
+      <!-- 3D 实体书组件 -->
+      <div class="book-3d-container" id="book3dContainer" tabindex="0" aria-label="点击或悬停翻开书单">
+        <div class="book-spine"></div>
+        <div class="book-page-back">
+          <div class="page-content">
+            <span class="page-eyebrow">LUMEN LISTS</span>
+            <h4 class="page-title-sm">主题书单</h4>
+            <div class="page-line"></div>
+            <p class="page-desc">按主题精选成单<br>点开一份，顺着读下去</p>
+          </div>
+        </div>
+        <div class="book-cover-front" id="bookCoverFront">
+          <div class="cover-content">
+            <span class="cover-title">书单</span>
+            <div class="cover-deco-line"></div>
+            <span class="cover-sub">LUMEN BOOKS</span>
+          </div>
+        </div>
+        <div class="book-shadow"></div>
+      </div>
+
+      <!-- 6 个话题浮点（纸签，JS 渲染） -->
+      <div class="floating-tags-container" id="floatingTagsContainer"></div>
+
+      <!-- 原地速览卡片 -->
+      <div class="preview-card-popover" id="previewCardPopover" role="dialog" aria-modal="true" aria-label="书单速览" hidden>
+        <button class="card-close-btn" id="cardCloseBtn" aria-label="关闭速览卡片">✕</button>
+        <div class="card-header">
+          <span class="card-eyebrow">Curated List</span>
+          <h3 class="card-title" id="cardTitle">--</h3>
+          <p class="card-desc" id="cardDesc">--</p>
+          <div class="card-curator" id="cardCurator">策展人：--</div>
+        </div>
+        <div class="card-stats-row" id="cardStatsRow">
+          <div class="stat-item"><span class="stat-val" id="statTotal">-</span><span class="stat-lbl">共计本数</span></div>
+          <div class="stat-item"><span class="stat-val" id="statOnSale">-</span><span class="stat-lbl">在售本数</span></div>
+          <div class="stat-item"><span class="stat-val" id="statMinPrice">-</span><span class="stat-lbl">最低价</span></div>
+          <div class="stat-item"><span class="stat-val" id="statFavs">-</span><span class="stat-lbl">收藏数</span></div>
+        </div>
+        <div class="card-books-preview">
+          <div class="preview-hd">包含精选图书：</div>
+          <ul class="preview-book-list" id="previewBookList"></ul>
+          <div class="more-books-hint" id="moreBooksHint">... 其余图书见完整书单</div>
+        </div>
+        <div class="card-footer">
+          <a href="#" class="view-full-btn" id="viewFullBtn">查看完整书单 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container" id="squareGrid">
+  <div class="list-grid" id="listGrid">
+
+    <article class="list-card reveal" data-list-id="1">
+      <div class="card-covers">
+        <span class="mini" style="--book-bg:#111111"></span>
+        <span class="mini" style="--book-bg:#c0c0c0"></span>
+        <span class="mini" style="--book-bg:#A1DB67"></span>
+        <span class="mini-count">12 Books</span>
+      </div>
+      <h3>通识经典 · 认识世界的 12 种方式</h3>
+      <p>从人类学到经济学，搭起你的知识坐标系。</p>
+      <div class="card-foot">
+        <span class="curator">馆员 · 陈老师</span>
+        <span>12 本在售 · 最低 ¥8</span>
+      </div>
+    </article>
+
+    <article class="list-card reveal" data-list-id="2">
+      <div class="card-covers">
+        <span class="mini" style="--book-bg:#A1DB67"></span>
+        <span class="mini" style="--book-bg:#c0c0c0"></span>
+        <span class="mini" style="--book-bg:#111111"></span>
+        <span class="mini-count">9 Books</span>
+      </div>
+      <h3>写给年轻人的心理学入门</h3>
+      <p>理解情绪、关系与自我，从这 9 本开始。</p>
+      <div class="card-foot">
+        <span class="curator">读者 · 苏昀</span>
+        <span>9 本在售 · 最低 ¥6</span>
+      </div>
+    </article>
+
+    <article class="list-card reveal" data-list-id="3">
+      <div class="card-covers">
+        <span class="mini" style="--book-bg:#A1DB67"></span>
+        <span class="mini" style="--book-bg:#111111"></span>
+        <span class="mini" style="--book-bg:#c0c0c0"></span>
+        <span class="mini-count">15 Books</span>
+      </div>
+      <h3>中文写作与表达力提升书单</h3>
+      <p>论文、报告、演讲，让文字成为底气。</p>
+      <div class="card-foot">
+        <span class="curator">写作中心 · 联合推荐</span>
+        <span>15 本在售 · 最低 ¥5</span>
+      </div>
+    </article>
+
+    <article class="list-card reveal" data-list-id="4">
+      <div class="card-covers">
+        <span class="mini" style="--book-bg:#c0c0c0"></span>
+        <span class="mini" style="--book-bg:#111111"></span>
+        <span class="mini" style="--book-bg:#A1DB67"></span>
+        <span class="mini-count">8 Books</span>
+      </div>
+      <h3>技术与未来 · 人工智能通识读本</h3>
+      <p>不写代码也能读懂的 AI 时代生存指南。</p>
+      <div class="card-foot">
+        <span class="curator">读者 · 郑一鸣</span>
+        <span>8 本在售 · 最低 ¥12</span>
+      </div>
+    </article>
+
+    <article class="list-card reveal" data-list-id="5">
+      <div class="card-covers">
+        <span class="mini" style="--book-bg:#A1DB67"></span>
+        <span class="mini" style="--book-bg:#111111"></span>
+        <span class="mini" style="--book-bg:#c0c0c0"></span>
+        <span class="mini-count">11 Books</span>
+      </div>
+      <h3>夏日长篇小说 · 读不完的黄昏</h3>
+      <p>适合假期一口气读完的 11 部长篇。</p>
+      <div class="card-foot">
+        <span class="curator">馆员 · 林筱</span>
+        <span>11 本在售 · 最低 ¥9</span>
+      </div>
+    </article>
+
+    <article class="list-card reveal" data-list-id="6">
+      <div class="card-covers">
+        <span class="mini" style="--book-bg:#111111"></span>
+        <span class="mini" style="--book-bg:#A1DB67"></span>
+        <span class="mini" style="--book-bg:#c0c0c0"></span>
+        <span class="mini-count">10 Books</span>
+      </div>
+      <h3>毕业前想读一遍的十本书</h3>
+      <p>关于选择、远方，以及成为什么样的人。</p>
+      <div class="card-foot">
+        <span class="curator">读者 · 何叙</span>
+        <span>10 本在售 · 最低 ¥7</span>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ==================== 书单详情（隐藏视图，带 ?id= 时显示） ==================== -->
+<section class="page-head" id="viewDetail" style="display:none;">
+  <div class="container">
+    <div class="surface page-head-inner">
+
+      <div class="breadcrumb">
+        <a href="index.html">首页</a>
+        <span class="sep">/</span>
+        <a href="lists.html">书单</a>
+        <span class="sep">/</span>
+        <span id="crumbName">书单详情</span>
+      </div>
+
+      <div class="detail-hero" style="padding:0;">
+        <div>
+          <div class="list-meta">
+            <div class="covers">
+              <span class="mini" style="--book-bg:#111111"></span>
+              <span class="mini" style="--book-bg:#c0c0c0"></span>
+              <span class="mini" style="--book-bg:#A1DB67"></span>
+            </div>
+            <div>
+              <span class="eyebrow" style="margin-bottom:6px;">Curated List</span>
+              <div style="font-size:13px;color:var(--text-faint);" id="curatorLine">馆员 · 陈老师</div>
+            </div>
+          </div>
+
+          <h1 id="detailTitle">通识经典 · 认识世界的 12 种方式</h1>
+          <p class="desc" id="detailDesc">从人类学到经济学，搭起你的知识坐标系。</p>
+
+          <div class="detail-stats">
+            <div class="stat"><b id="statBooks">12</b><span>本书</span></div>
+            <div class="stat"><b id="statOnSale">12</b><span>本在售</span></div>
+            <div class="stat"><b id="statLow">¥8</b><span>最低价</span></div>
+            <div class="stat"><b id="statFav">1.2k</b><span>人收藏</span></div>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <a class="btn-primary" href="market.html" id="buyAllBtn">查看书单内全部在售 →</a>
+          <a class="btn-ghost" href="lists.html">← 返回书单广场</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="container" id="detailBooksWrap" style="display:none;">
+  <div class="surface book-rows">
+    <div class="row-head">
+      <h3>书单内书目</h3>
+      <span class="row-hint">点击「看在售」跳到在售列表，搜索同款二手</span>
+    </div>
+    <div id="bookRows"></div>
+  </div>
+</section>
+
+<!-- ==================== Footer ==================== -->
+<div class="site-footer-wrap">
+  <footer class="site-footer container">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <a class="logo" href="index.html">
+          <span class="logo-mark">L</span>
+          <span class="logo-text">
+            <b>LUMEN</b>
+            <em>Books</em>
+          </span>
+        </a>
+        <p>大学生二手书流转平台 · 扫码卖书 · 按品相定价 · 担保交易。<br>让每一本旧书遇见下一位读者。</p>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <h5>Discover</h5>
+          <a href="lists.html">书单</a>
+          <a href="market.html">淘书</a>
+          <a href="reviews.html#wantedSection">寻书</a>
+          <a href="reviews.html">书话</a>
+        </div>
+        <div>
+          <h5>Service</h5>
+          <a href="sell.html">卖书</a>
+          <a href="sell.html#rules">回收规则</a>
+          <a href="#">交易担保</a>
+          <a href="#">售后仲裁</a>
+        </div>
+        <div>
+          <h5>About</h5>
+          <a href="#">平台规则</a>
+          <a href="#">联系我们</a>
+          <a href="#">使用条款</a>
+          <a href="#">隐私说明</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LUMEN BOOKS · 仅用于学习交流</span>
+      <span>Reading makes us meet.</span>
+    </div>
+  </footer>
+</div>
+
+<script src="store.js"></script>
+<script>
+/* ============================================================
+   书单数据：id → 书单信息
+   书目本身（书名 / 作者 / 价格）统一以 store.js 的 CATALOG 为准，
+   书单里只保留「书单语境」才有的东西：pub 展示串、note 推荐语、onSale。
+   ============================================================ */
+const LISTS = {
+  1: {
+    title: '通识经典 · 认识世界的 12 种方式',
+    desc: '从人类学到经济学，搭起你的知识坐标系。',
+    curator: '馆员 · 陈老师',
+    fav: '1.2k',
+    books: [
+      { title:'人类简史：从动物到上帝', author:'尤瓦尔·赫拉利', pub:'中信出版社 · 2014', note:'理解人类如何从普通动物走到今天。', price:20, onSale:true },
+      { title:'枪炮、病菌与钢铁', author:'贾雷德·戴蒙德', pub:'中信出版社 · 2016', note:'地理与环境的长期影响，解释文明差异。', price:16, onSale:true },
+      { title:'置身事内：中国政府与经济发展', author:'兰小欢', pub:'上海人民出版社 · 2021', note:'把地方政府的行为逻辑讲得最清楚的一本。', price:18, onSale:true },
+      { title:'思考，快与慢', author:'丹尼尔·卡尼曼', pub:'中信出版社 · 2012', note:'系统 1 与系统 2，决策心理学的入门经典。', price:28, onSale:true },
+      { title:'乡土中国', author:'费孝通', pub:'北京大学出版社 · 2012', note:'理解中国社会结构的必读书。', price:9, onSale:true },
+      { title:'社会学的想象力', author:'C. 赖特·米尔斯', pub:'北京师范大学出版社 · 2017', note:'把个人困境放到社会结构中去看。', price:14, onSale:true },
+      { title:'瓦尔登湖', author:'亨利·戴维·梭罗', pub:'人民文学出版社 · 2018', note:'独居湖畔两年，关于简朴与自由的思考。', price:15, onSale:true },
+      { title:'百年孤独', author:'加西亚·马尔克斯', pub:'南海出版公司 · 2017', note:'魔幻现实主义的巅峰之作。', price:12, onSale:true },
+      { title:'被讨厌的勇气', author:'岸见一郎 · 古贺史健', pub:'机械工业出版社 · 2020', note:'阿德勒心理学，关于课题分离与自由。', price:22, onSale:true },
+      { title:'人类群星闪耀时', author:'斯蒂芬·茨威格', pub:'生活·读书·新知三联书店 · 2015', note:'十四个改变历史的瞬间。', price:18, onSale:true },
+      { title:'万历十五年', author:'黄仁宇', pub:'中华书局 · 2006', note:'从一年切入，看一个王朝的结构性困境。', price:16, onSale:true },
+      { title:'月亮与六便士', author:'毛姆', pub:'上海译文出版社 · 2018', note:'关于理想与现实的永恒拷问。', price:13, onSale:true }
+    ]
+  },
+  2: {
+    title: '写给年轻人的心理学入门',
+    desc: '理解情绪、关系与自我，从这 9 本开始。',
+    curator: '读者 · 苏昀',
+    fav: '986',
+    books: [
+      { title:'被讨厌的勇气', author:'岸见一郎 · 古贺史健', pub:'机械工业出版社 · 2020', note:'阿德勒心理学，关于课题分离与自由。', price:22, onSale:true },
+      { title:'思考，快与慢', author:'丹尼尔·卡尼曼', pub:'中信出版社 · 2012', note:'系统 1 与系统 2，决策心理学的入门经典。', price:28, onSale:true },
+      { title:'乌合之众', author:'古斯塔夫·勒庞', pub:'中央编译出版社 · 2018', note:'群体心理的经典观察。', price:12, onSale:true },
+      { title:'爱的艺术', author:'艾里希·弗洛姆', pub:'上海译文出版社 · 2018', note:'爱不是运气，是一种能力。', price:14, onSale:true },
+      { title:'我们时代的神经症人格', author:'卡伦·霍妮', pub:'译林出版社 · 2016', note:'焦虑与内心冲突的深层分析。', price:18, onSale:true },
+      { title:'自控力', author:'凯利·麦格尼格尔', pub:'文化发展出版社 · 2012', note:'关于意志力的科学解释。', price:16, onSale:false },
+      { title:'非暴力沟通', author:'马歇尔·卢森堡', pub:'华夏出版社 · 2009', note:'让表达不再伤人的沟通方式。', price:15, onSale:true },
+      { title:'亲密关系', author:'罗兰·米勒', pub:'人民邮电出版社 · 2015', note:'关于关系的研究综述。', price:32, onSale:true },
+      { title:'影响力', author:'罗伯特·西奥迪尼', pub:'北京联合出版公司 · 2016', note:'六大说服原理。', price:20, onSale:true }
+    ]
+  },
+  3: {
+    title: '中文写作与表达力提升书单',
+    desc: '论文、报告、演讲，让文字成为底气。',
+    curator: '写作中心 · 联合推荐',
+    fav: '1.5k',
+    books: [
+      { title:'文心', author:'夏丏尊 · 叶圣陶', pub:'生活·读书·新知三联书店 · 2008', note:'把写作讲得像聊天一样清楚。', price:12, onSale:true },
+      { title:'写作这回事', author:'斯蒂芬·金', pub:'上海文艺出版社 · 2014', note:'大师级的写作回忆与建议。', price:18, onSale:true },
+      { title:'风格感觉', author:'史蒂芬·平克', pub:'机械工业出版社 · 2018', note:'21 世纪写作指南。', price:36, onSale:true },
+      { title:'非虚构写作指南', author:'威廉·津瑟', pub:'中国人民大学出版社 · 2017', note:'非虚构写作的经典教材。', price:22, onSale:true },
+      { title:'金字塔原理', author:'芭芭拉·明托', pub:'南海出版公司 · 2013', note:'结构化表达与思考的方法。', price:24, onSale:true },
+      { title:'学会提问', author:'尼尔·布朗', pub:'机械工业出版社 · 2019', note:'批判性思维入门。', price:20, onSale:true },
+      { title:'中式英语之鉴', author:'琼·平卡姆', pub:'外语教学与研究出版社 · 2000', note:'中译英常见问题指南。', price:26, onSale:true },
+      { title:'修辞学', author:'亚里士多德', pub:'上海人民出版社 · 2018', note:'西方修辞学的源头。', price:28, onSale:false },
+      { title:'论文写作与学术规范', author:'李怀祖', pub:'西安交通大学出版社 · 2016', note:'学术写作的规范与流程。', price:19, onSale:true },
+      { title:'演讲的力量', author:'克里斯·安德森', pub:'中信出版社 · 2016', note:'TED 掌门人的演讲方法。', price:21, onSale:true },
+      { title:'故事', author:'罗伯特·麦基', pub:'天津人民出版社 · 2014', note:'关于故事结构的权威之作。', price:38, onSale:true },
+      { title:'文案训练手册', author:'约瑟夫·休格曼', pub:'中信出版社 · 2011', note:'广告文案的实战经验。', price:18, onSale:true },
+      { title:'写作是门手艺', author:'刘军强', pub:'广西师范大学出版社 · 2020', note:'面向中文写作的方法书。', price:25, onSale:true },
+      { title:'如何阅读一本书', author:'莫提默·艾德勒', pub:'商务印书馆 · 2004', note:'阅读方法论的基础。', price:23, onSale:true },
+      { title:'有效写作', author:'约翰·比蒂', pub:'世界图书出版公司 · 2014', note:'英文写作的实用建议。', price:17, onSale:true }
+    ]
+  },
+  4: {
+    title: '技术与未来 · 人工智能通识读本',
+    desc: '不写代码也能读懂的 AI 时代生存指南。',
+    curator: '读者 · 郑一鸣',
+    fav: '2.3k',
+    books: [
+      { title:'人工智能简史', author:'尼克', pub:'人民邮电出版社 · 2017', note:'AI 发展的完整脉络。', price:28, onSale:true },
+      { title:'生命 3.0', author:'迈克斯·泰格马克', pub:'浙江人民出版社 · 2018', note:'人工智能时代的人类命运。', price:32, onSale:true },
+      { title:'AI·未来', author:'李开复', pub:'浙江人民出版社 · 2018', note:'AI 对中国社会与产业的影响。', price:24, onSale:true },
+      { title:'超级智能', author:'尼克·波斯特洛姆', pub:'中信出版社 · 2015', note:'关于超级智能的风险与路径。', price:30, onSale:true },
+      { title:'人类简史', author:'尤瓦尔·赫拉利', pub:'中信出版社 · 2014', note:'从认知革命到科技革命。', price:20, onSale:true },
+      { title:'未来简史', author:'尤瓦尔·赫拉利', pub:'中信出版社 · 2017', note:'数据主义与人文主义的未来。', price:26, onSale:true },
+      { title:'深度学习', author:'伊恩·古德费洛', pub:'人民邮电出版社 · 2017', note:'深度学习领域的权威教材。', price:58, onSale:false },
+      { title:'算法图解', author:'阿迪蒂亚·巴尔加瓦', pub:'人民邮电出版社 · 2017', note:'用图讲算法的入门书。', price:22, onSale:true }
+    ]
+  },
+  5: {
+    title: '夏日长篇小说 · 读不完的黄昏',
+    desc: '适合假期一口气读完的 11 部长篇。',
+    curator: '馆员 · 林筱',
+    fav: '874',
+    books: [
+      { title:'百年孤独', author:'加西亚·马尔克斯', pub:'南海出版公司 · 2017', note:'魔幻现实主义的巅峰之作。', price:12, onSale:true },
+      { title:'霍乱时期的爱情', author:'加西亚·马尔克斯', pub:'南海出版公司 · 2012', note:'一场跨越半个世纪的爱情。', price:18, onSale:true },
+      { title:'追风筝的人', author:'卡勒德·胡赛尼', pub:'上海人民出版社 · 2006', note:'关于救赎与友谊。', price:14, onSale:true },
+      { title:'1984', author:'乔治·奥威尔', pub:'上海译文出版社 · 2009', note:'反乌托邦的经典。', price:13, onSale:true },
+      { title:'美丽新世界', author:'阿道司·赫胥黎', pub:'上海译文出版社 · 2017', note:'另一种反乌托邦想象。', price:15, onSale:true },
+      { title:'局外人', author:'阿尔贝·加缪', pub:'上海译文出版社 · 2013', note:'荒诞哲学的代表小说。', price:12, onSale:true },
+      { title:'挪威的森林', author:'村上春树', pub:'上海译文出版社 · 2007', note:'关于青春与失去。', price:16, onSale:true },
+      { title:'海边的卡夫卡', author:'村上春树', pub:'上海译文出版社 · 2007', note:'现实与隐喻交织的旅程。', price:19, onSale:true },
+      { title:'杀死一只知更鸟', author:'哈珀·李', pub:'译林出版社 · 2016', note:'关于正义与成长。', price:17, onSale:true },
+      { title:'了不起的盖茨比', author:'菲茨杰拉德', pub:'上海译文出版社 · 2013', note:'爵士时代的挽歌。', price:11, onSale:true },
+      { title:'安娜·卡列尼娜', author:'列夫·托尔斯泰', pub:'上海译文出版社 · 2010', note:'关于爱、婚姻与社会的长篇。', price:28, onSale:true }
+    ]
+  },
+  6: {
+    title: '毕业前想读一遍的十本书',
+    desc: '关于选择、远方，以及成为什么样的人。',
+    curator: '读者 · 何叙',
+    fav: '1.1k',
+    books: [
+      { title:'月亮与六便士', author:'毛姆', pub:'上海译文出版社 · 2018', note:'关于理想与现实的永恒拷问。', price:13, onSale:true },
+      { title:'麦田里的守望者', author:'J.D. 塞林格', pub:'译林出版社 · 2010', note:'青春期的迷茫与反抗。', price:14, onSale:true },
+      { title:'在路上', author:'杰克·凯鲁亚克', pub:'上海译文出版社 · 2006', note:'垮掉的一代的精神地图。', price:18, onSale:true },
+      { title:'瓦尔登湖', author:'亨利·戴维·梭罗', pub:'人民文学出版社 · 2018', note:'独居湖畔两年，关于简朴与自由的思考。', price:15, onSale:true },
+      { title:'当我谈跑步时我谈些什么', author:'村上春树', pub:'南海出版公司 · 2009', note:'关于坚持与写作的随笔。', price:16, onSale:true },
+      { title:'人类群星闪耀时', author:'斯蒂芬·茨威格', pub:'生活·读书·新知三联书店 · 2015', note:'十四个改变历史的瞬间。', price:18, onSale:true },
+      { title:'苏东坡传', author:'林语堂', pub:'湖南文艺出版社 · 2018', note:'一个有趣灵魂的一生。', price:22, onSale:true },
+      { title:'给青年的十二封信', author:'朱光潜', pub:'中华书局 · 2013', note:'关于读书、升学与人生。', price:12, onSale:true },
+      { title:'悉达多', author:'赫尔曼·黑塞', pub:'上海人民出版社 · 2015', note:'一个人寻找自我的旅程。', price:15, onSale:true },
+      { title:'小王子', author:'安东尼·德·圣埃克苏佩里', pub:'人民文学出版社 · 2003', note:'写给大人的童话。', price:9, onSale:true }
+    ]
+  }
+};
+
+/* ============================================================
+   书名 → 书目 id：让书单里的价格 / 书名 / 作者统一由 store.js 提供
+   ============================================================ */
+const CATALOG_BY_TITLE = (function () {
+  const map = {};
+  Object.keys(Store.catalog).forEach(function (id) {
+    map[Store.catalog[id].title.replace(/[《》]/g, '')] = id;
+  });
+  return map;
+})();
+
+function storeBookOf(title) {
+  const key = String(title).replace(/[《》]/g, '');
+  let id = CATALOG_BY_TITLE[key];
+  if (!id) {
+    /* 允许简称命中（如书单里的「人类简史」） */
+    const keys = Object.keys(CATALOG_BY_TITLE);
+    for (let i = 0; i < keys.length; i++) {
+      if (keys[i].indexOf(key) === 0 || key.indexOf(keys[i]) === 0) { id = CATALOG_BY_TITLE[keys[i]]; break; }
+    }
+  }
+  return id ? Store.getBook(id) : null;
+}
+
+/* ============================================================
+   视图切换：根据 URL 参数决定显示广场还是详情
+   ============================================================ */
+const params = new URLSearchParams(location.search);
+const listId = params.get('id');
+
+const viewSquare = document.getElementById('viewSquare');
+const squareGrid = document.getElementById('squareGrid');
+const viewDetail = document.getElementById('viewDetail');
+const detailBooksWrap = document.getElementById('detailBooksWrap');
+
+function renderSquare(){
+  viewSquare.style.display = '';
+  squareGrid.style.display = 'none';   /* 网格保留在 DOM 仅隐藏：主内容是展开的书本 */
+  viewDetail.style.display = 'none';
+  detailBooksWrap.style.display = 'none';
+  /* 书单广场视图：显示精装书场景 */
+  const bookWrap = document.getElementById('bookWrap');
+  if (bookWrap) bookWrap.style.display = '';
+
+  // 卡片点击 → 进入详情
+  document.querySelectorAll('#listGrid .list-card').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => {
+      const id = card.getAttribute('data-list-id');
+      location.href = 'lists.html?id=' + id;
+    });
+  });
+}
+
+function renderDetail(id){
+  const data = LISTS[id];
+  if (!data) { renderSquare(); return; }
+
+  viewSquare.style.display = 'none';
+  squareGrid.style.display = 'none';
+  viewDetail.style.display = '';
+  detailBooksWrap.style.display = '';
+  /* 书单详情视图：隐藏精装书场景 */
+  const bookWrap = document.getElementById('bookWrap');
+  if (bookWrap) bookWrap.style.display = 'none';
+
+  // 填充头部
+  document.getElementById('crumbName').textContent = data.title;
+  document.getElementById('detailTitle').textContent = data.title;
+  document.getElementById('detailDesc').textContent  = data.desc;
+  document.getElementById('curatorLine').textContent = data.curator;
+  document.title = data.title + ' · LUMEN BOOKS';
+
+  /* 书单条目 → 与 store.js 目录对齐（书名 / 作者 / 价格以目录为准） */
+  const rows = data.books.map(function (book) {
+    const sb = storeBookOf(book.title);
+    return {
+      title:  sb ? sb.title  : book.title,
+      author: sb ? sb.author : book.author,
+      pub:    book.pub,
+      note:   book.note,
+      onSale: book.onSale,
+      price:  sb ? sb.price  : book.price
+    };
+  });
+
+  const onSaleCount = rows.filter(b => b.onSale).length;
+  const lowest = Math.min.apply(null, rows.filter(b => b.onSale).map(b => b.price));
+
+  document.getElementById('statBooks').textContent   = rows.length;
+  document.getElementById('statOnSale').textContent  = onSaleCount;
+  document.getElementById('statLow').textContent     = '¥' + lowest;
+  document.getElementById('statFav').textContent     = data.fav;
+
+  // 「查看书单内全部在售」→ market.html（无参数，演示阶段）
+  document.getElementById('buyAllBtn').href = 'market.html';
+
+  // 渲染书目
+  const rowsEl = document.getElementById('bookRows');
+  const byTitle = {};
+  Object.keys(Store.catalog).forEach(function (k) { byTitle[Store.catalog[k].title] = k; });
+  rowsEl.innerHTML = rows.map((b, i) => {
+    const cid = byTitle[b.title] || null;
+    const q = encodeURIComponent(b.title);
+    const priceHtml = b.onSale
+      ? `<span class="price"><small>¥</small>${b.price}</span><span class="sub">在售</span>`
+      : `<span class="sold-out">暂无在售</span>`;
+
+    const cta = b.onSale
+      ? `<a class="primary" href="market.html?q=${q}">看在售 →</a>`
+      : `<a href="market.html?q=${q}">搜索同款</a>`;
+
+    return `
+      <div class="book-row reveal">
+        <span class="row-idx">${String(i+1).padStart(2,'0')}</span>
+        <span class="row-cover" style="--book-bg:${i % 3 === 0 ? '#111111' : i % 3 === 1 ? '#c0c0c0' : '#A1DB67'};"${cid ? ` data-cover="${cid}"` : ''}></span>
+        <div class="row-info">
+          <h4>${b.title}</h4>
+          <p>${b.author} · ${b.pub}</p>
+          <div class="note">${b.note}</div>
+        </div>
+        <div class="row-status">${priceHtml}</div>
+        <div class="row-cta">${cta}</div>
+      </div>
+    `;
+  }).join('');
+  Store.applyCovers(rowsEl);
+
+  // 对新生成的 .reveal 重新观察
+  document.querySelectorAll('#bookRows .reveal').forEach(el => {
+    el.classList.add('in');
+  });
+}
+
+/* 启动 */
+if (listId) {
+  renderDetail(listId);
+} else {
+  renderSquare();
+}
+
+/* ---------- Reveal 广场卡片 ---------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = (i % 3) * 80 + 'ms';
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('#listGrid .reveal').forEach(el => io.observe(el));
+
+/* ============================================================
+   3D 书本 + 话题纸签 + 原地速览卡片 —— 书单广场开场场景
+   数据源 = 本页 LISTS（真实书单），悬停/点击翻书 → 纸签入场 →
+   点击纸签弹出速览卡片（统计 + 前 4 本）→「查看完整书单」进详情。
+   ============================================================ */
+(function () {
+  const wrapper = document.getElementById('bookInteractiveWrapper');
+  const book3d = document.getElementById('book3dContainer');
+  if (!wrapper || !book3d) return;
+
+  /* 详情视图不初始化（renderDetail 已隐藏场景） */
+  const params = new URLSearchParams(location.search);
+  if (params.get('id')) return;
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  const tagsContainer = document.getElementById('floatingTagsContainer');
+  const popover = document.getElementById('previewCardPopover');
+  const closeBtn = document.getElementById('cardCloseBtn');
+  const viewFullBtn = document.getElementById('viewFullBtn');
+
+  let activeTagElement = null;
+  let lastFocusedElement = null;
+  let hoverTimer = null;
+
+  /* 由 LISTS 派生卡片数据（真实：本数 / 在售 / 最低价 / 收藏 / 前 4 本） */
+  const listsData = Object.keys(LISTS).map(function (id) {
+    const L = LISTS[id];
+    const onSale = L.books.filter(b => b.onSale);
+    const minPrice = onSale.length ? Math.min.apply(null, onSale.map(b => b.price)) : null;
+    return {
+      id: id,
+      title: L.title,
+      desc: L.desc,
+      curator: L.curator,
+      totalCount: L.books.length,
+      onSaleCount: onSale.length,
+      minPrice: minPrice,
+      favCount: L.fav,
+      books: L.books.slice(0, 4).map(b => ({ name: b.title, author: b.author }))
+    };
+  });
+
+  /* 9 个话题纸签：与 reviews.html 话题栏共用同一套话题体系（数字 id 对应）。
+     点击 → 速览卡片 →「查看完整书单」跳转 lists.html?id=<话题id>。 */
+  const TOPICS = [
+    { id: 1,  title: '大学四年改变我的书',     tag: '12 本', fav: '2.1k', desc: '从入学到毕业，重塑认知与选择的那些书。' },
+    { id: 5,  title: '治愈精神内耗的处方',     tag: '9 本',  fav: '986',  desc: '拒绝焦虑与内耗，学会与情绪相处。' },
+    { id: 6,  title: '学会与自己独处',         tag: '8 本',  fav: '1.5k', desc: '一个人也能过得丰盛的练习册。' },
+    { id: 9,  title: '文科生的经济学启蒙',     tag: '10 本', fav: '2.3k', desc: '不写模型也能读懂的经济逻辑。' },
+    { id: 10, title: '看懂世界的运转逻辑',     tag: '15 本', fav: '874',  desc: '社会、制度与结构，把世界拆开给你看。' },
+    { id: 12, title: '中文系教授的私藏书单',   tag: '11 本', fav: '1.1k', desc: '课堂之外的私房推荐，从古典到现代。' },
+    { id: 13, title: '一口气读完的悬疑神作',   tag: '7 本',  fav: '642',  desc: '翻开就停不下来的枕边悬念。' },
+    { id: 15, title: '被书名耽误的好书',       tag: '6 本',  fav: '518',  desc: '名字劝退、内容封神的宝藏书。' },
+    { id: 20, title: '陪我度过低谷的书',       tag: '9 本',  fav: '703',  desc: '在那些难捱的日子里托住你的文字。' }
+  ];
+  const TAGS = TOPICS.map(function (t) {
+    return {
+      kind: 'topic',
+      title: t.title,
+      sub: t.tag,
+      card: {
+        id: t.id, title: t.title, desc: t.desc, curator: 'LUMEN 话题',
+        totalCount: parseInt(t.tag, 10), onSaleCount: null, minPrice: null,
+        favCount: t.fav, books: []
+      }
+    };
+  });
+
+  /* 确定性网格定位：按容器实测宽度选列数（4/3/2），
+     行内奇数行右移半列、列内上下错落，配合 CSS max-width 保证互不遮挡。 */
+  function gridPos(index, n, cols) {
+    const rows = Math.ceil(n / cols);
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    const cw = 100 / cols, rh = 100 / rows;
+    let left = col * cw + (row % 2 ? cw * 0.14 : 0);
+    let top = row * rh + (col % 2 ? rh * 0.12 : 0);
+    if (left > 100 - cw) left = 100 - cw;      // 防右越界
+    return { left: left.toFixed(2) + '%', top: top.toFixed(2) + '%' };
+  }
+
+  function tagCols() {
+    const w = tagsContainer.clientWidth || 600;
+    return w >= 880 ? 4 : (w >= 560 ? 3 : 2);
+  }
+
+  /* ---------------- 渲染 20 个纸签 ---------------- */
+  function renderFloatingTags() {
+    tagsContainer.innerHTML = '';
+    const cols = tagCols();
+    TAGS.forEach(function (t, index) {
+      const tag = document.createElement('div');
+      tag.className = 'tag-float-item';
+      tag.setAttribute('role', 'button');
+      tag.setAttribute('tabindex', '0');
+      tag.dataset.id = t.card.id;
+      tag.setAttribute('aria-label', '话题：' + t.title + '（' + t.sub + '），打开速览');
+
+      const pos = gridPos(index, TAGS.length, cols);
+      tag.style.top = pos.top;
+      tag.style.left = pos.left;
+      tag.style.transitionDelay = (index * 0.08) + 's';
+      tag.style.animationDelay = (index * 0.22) + 's';
+
+      tag.innerHTML =
+        '<span class="tag-dot"></span>' +
+        '<div class="tag-text-wrap">' +
+          '<span class="tag-title">' + t.title + '</span>' +
+          '<span class="tag-count">' + t.sub + '</span>' +
+        '</div>';
+
+      tag.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openPreviewCard(t.card, tag);
+      });
+      /* 键盘可达：Enter / 空格打开 */
+      tag.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openPreviewCard(t.card, tag);
+        }
+      });
+
+      tagsContainer.appendChild(tag);
+    });
+  }
+
+  /* ---------------- 翻开 / 合上 ---------------- */
+  function openBook() {
+    book3d.classList.add('is-open');
+    wrapper.classList.add('is-expanded');
+    if (reduce) return;
+    setTimeout(function () {
+      tagsContainer.querySelectorAll('.tag-float-item').forEach(function (t) {
+        t.classList.add('breathe-active');
+      });
+    }, 600);
+  }
+
+  function closeBook() {
+    if (!popover.hasAttribute('hidden')) return;   /* 卡片打开中不合书 */
+    book3d.classList.remove('is-open');
+    wrapper.classList.remove('is-expanded');
+    tagsContainer.querySelectorAll('.tag-float-item').forEach(function (t) {
+      t.classList.remove('breathe-active');
+    });
+  }
+
+  const isMobile = window.innerWidth <= 639;
+
+  if (!isMobile && canHover) {
+    /* 桌面：每次进入页面自动翻开（延迟 500ms 等首屏渲染） */
+    setTimeout(openBook, 500);
+    book3d.addEventListener('mouseenter', function () {
+      clearTimeout(hoverTimer);
+      openBook();
+    });
+    wrapper.addEventListener('mouseleave', function () {
+      hoverTimer = setTimeout(closeBook, 220);
+    });
+  } else {
+    /* 移动端：点按切换 */
+    book3d.addEventListener('click', function () {
+      if (book3d.classList.contains('is-open')) closeBook();
+      else openBook();
+    });
+  }
+
+  /* 键盘：书本上 Enter / 空格翻合 */
+  book3d.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (book3d.classList.contains('is-open')) closeBook();
+      else openBook();
+    }
+  });
+
+  /* ---------------- 速览卡片 ---------------- */
+  function openPreviewCard(data, tagEl) {
+    lastFocusedElement = tagEl;
+    activeTagElement = tagEl;
+
+    tagsContainer.querySelectorAll('.tag-float-item').forEach(function (t) {
+      t.classList.remove('is-active-tag');
+    });
+    tagEl.classList.add('is-active-tag');
+    wrapper.classList.add('has-active-card');
+
+    document.getElementById('cardTitle').textContent = data.title;
+    document.getElementById('cardDesc').textContent = data.desc;
+    document.getElementById('cardCurator').textContent = '策展人：' + data.curator;
+    document.getElementById('statTotal').textContent = data.totalCount + ' 本';
+    document.getElementById('statOnSale').textContent =
+      data.onSaleCount !== null ? data.onSaleCount + ' 本' : '—';
+    document.getElementById('statMinPrice').textContent =
+      data.minPrice !== null ? '¥' + data.minPrice.toFixed(2) : '—';
+    document.getElementById('statFavs').textContent = data.favCount;
+
+    const bookList = document.getElementById('previewBookList');
+    bookList.innerHTML = '';
+    data.books.forEach(function (b, idx) {
+      const li = document.createElement('li');
+      li.className = 'preview-book-item';
+      li.textContent = (idx + 1) + '. 《' + b.name + '》 - ' + b.author;
+      bookList.appendChild(li);
+    });
+    /* 话题书单暂无书目数据时，隐藏图书预读区 */
+    const hasBooks = data.books.length > 0;
+    document.querySelector('.card-books-preview').style.display = hasBooks ? '' : 'none';
+    document.getElementById('moreBooksHint').style.display =
+      (hasBooks && data.totalCount > 4) ? '' : 'none';
+
+    /* 直达详情（复用本页 ?id= 路由） */
+    viewFullBtn.href = 'lists.html?id=' + data.id;
+
+    popover.removeAttribute('hidden');
+    openBook();
+
+    setTimeout(function () { viewFullBtn.focus(); }, 100);
+  }
+
+  function closePreviewCard() {
+    popover.setAttribute('hidden', '');
+    wrapper.classList.remove('has-active-card');
+    if (activeTagElement) activeTagElement.classList.remove('is-active-tag');
+    if (isMobile) closeBook();          /* 移动端关闭卡片时同步收书 */
+    if (lastFocusedElement) lastFocusedElement.focus();
+  }
+
+  closeBtn.addEventListener('click', closePreviewCard);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !popover.hasAttribute('hidden')) closePreviewCard();
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!popover.hasAttribute('hidden') &&
+        !popover.contains(e.target) &&
+        !e.target.closest('.tag-float-item')) {
+      closePreviewCard();
+    }
+  });
+
+  renderFloatingTags();
+  if (reduce) wrapper.classList.add('is-expanded');   /* 减少动效：直接呈现纸签 */
+
+  /* 窗口缩放：列数可能变化，按新网格重排位（保留卡片/呼吸状态） */
+  var layoutT = null;
+  window.addEventListener('resize', function () {
+    if (layoutT) clearTimeout(layoutT);
+    layoutT = setTimeout(function () {
+      const cols = tagCols();
+      tagsContainer.querySelectorAll('.tag-float-item').forEach(function (tag, index) {
+        const pos = gridPos(index, TAGS.length, cols);
+        tag.style.top = pos.top;
+        tag.style.left = pos.left;
+      });
+    }, 120);
+  });
+})();
+</script>
+
+<script src="auth.js"></script>
+<script src="nav-ball.js" defer></script>
+<!-- 方案 B · 一页之间：书签绸带 + 跨页刊头 -->
+<script src="spread.js"></script>  <script src="pt.js" defer></script>
+</body>
+</html>

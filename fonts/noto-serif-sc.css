@@ -1,0 +1,11 @@
+/* 思源宋体 Noto Serif SC —— 首页标题本地字体（900 字重）
+   仅含标题用到的 12 个汉字：一下书位旧本每者见让读遇
+   共 6 个 woff2，合计约 6.1 KB。放在 Google Fonts 之前加载，
+   标题字形一律用本地思源宋体，其余字形由 Google Fonts 兜底。
+   若日后修改首页标题文字，需按新文字重新生成这些文件。 */
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('noto-serif-sc-900-title-1.woff2') format('woff2');unicode-range:U+65E7;}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('noto-serif-sc-900-title-2.woff2') format('woff2');unicode-range:U+9047;}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('noto-serif-sc-900-title-3.woff2') format('woff2');unicode-range:U+4E66,U+6BCF,U+8BA9;}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('noto-serif-sc-900-title-4.woff2') format('woff2');unicode-range:U+89C1,U+8BFB;}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('noto-serif-sc-900-title-5.woff2') format('woff2');unicode-range:U+4E0B,U+4F4D,U+672C,U+8005;}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('noto-serif-sc-900-title-6.woff2') format('woff2');unicode-range:U+4E00;}

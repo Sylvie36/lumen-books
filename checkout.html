@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>确认订单 · LUMEN BOOKS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="common.css">
+<style>
+/* ============================================================
+   确认订单页：仅本页使用的布局样式
+   ============================================================ */
+.checkout-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:24px;align-items:start;margin-top:10px;}
+.order-card{padding:34px 32px;}
+.order-card + .order-card{margin-top:24px;}
+
+.block-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:var(--text);margin:0 0 22px;}
+.block-title .num{width:22px;height:22px;border-radius:50%;background:var(--text);color:#fff;font-size:12px;display:grid;place-items:center;flex:none;}
+
+.book-row{display:flex;gap:20px;align-items:center;}
+.book-cover-lg{width:92px;aspect-ratio:3/4.25;flex:none;border-radius:6px 16px 16px 6px;background:var(--book-bg,#111);padding:14px 10px;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 20px 40px -20px rgba(0,0,0,.4);}
+.book-cover-lg b{font-size:13px;line-height:1.3;font-weight:700;word-break:break-all;}
+.book-cover-lg span{font-size:9px;opacity:.7;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;}
+.book-meta-lg{flex:1;min-width:0;}
+.book-meta-lg h3{font-size:19px;font-weight:800;margin:0 0 6px;letter-spacing:-.01em;line-height:1.35;}
+.book-meta-lg .author{color:var(--text-dim);font-size:14px;margin:0 0 14px;}
+.tag{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--accent-bg);color:var(--accent);border:1px solid rgba(53,107,74,.40);margin:0 8px 8px 0;}
+.price-lg{font-size:22px;font-weight:800;color:var(--text);}
+.price-lg small{font-size:12px;font-weight:600;}
+.orig-lg{font-size:12px;color:var(--text-faint);text-decoration:line-through;margin-left:8px;}
+
+.qty-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;}
+.qty-row .q-lbl{color:var(--text-dim);font-size:14px;}
+.qty{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;}
+.qty button{width:42px;height:42px;border:0;background:var(--glass-strong);font-size:19px;cursor:pointer;color:var(--text);transition:.2s;}
+.qty button:hover{background:var(--text);color:#fff;}
+.qty span{width:48px;text-align:center;font-weight:700;font-size:15px;}
+
+.ship-opts{display:flex;flex-direction:column;gap:10px;}
+.ship-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--line);border-radius:var(--radius-sm);cursor:pointer;transition:.2s;}
+.ship-opt.active{border-color:var(--accent);background:var(--accent-bg);}
+.ship-opt input{accent-color:var(--accent);}
+.ship-opt .so-name{font-weight:600;font-size:14px;}
+.ship-opt .so-sub{font-size:12px;color:var(--text-faint);margin-left:4px;}
+.ship-opt .so-fee{margin-left:auto;font-weight:700;font-size:14px;color:var(--text);}
+
+.addr-box{display:flex;flex-direction:column;gap:12px;}
+.addr-line{display:flex;align-items:flex-start;gap:12px;}
+.addr-line label{font-size:13px;color:var(--text-faint);width:56px;flex:none;padding-top:11px;}
+.addr-line input,.addr-line textarea{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-size:14px;font-family:inherit;color:var(--text);background:var(--glass-strong);resize:vertical;}
+.addr-line input:focus,.addr-line textarea:focus{outline:none;border-color:var(--text);}
+.login-gate{padding:22px;border:1.5px dashed var(--line);border-radius:var(--radius-sm);text-align:center;color:var(--text-dim);font-size:14px;}
+.login-gate a{color:var(--accent);font-weight:700;}
+
+.sum-card{padding:30px 28px;position:sticky;top:110px;}
+.sum-line{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:14px;color:var(--text-dim);}
+.sum-line b{color:var(--text);font-weight:700;}
+.sum-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:16px;border-top:1px solid var(--line);}
+.sum-total .lab{font-size:14px;color:var(--text-dim);}
+.sum-total .val{font-size:28px;font-weight:800;color:var(--accent);}
+.sum-total .val small{font-size:14px;font-weight:700;}
+
+.btn-accent{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;padding:15px 28px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:.01em;transition:.25s;white-space:nowrap;border:1.5px solid var(--accent);cursor:pointer;}
+.btn-accent:hover{background:var(--color-primary-hover);border-color:var(--color-primary-hover);transform:translateY(-2px);}
+.btn-block{width:100%;margin-top:18px;}
+.note{font-size:12px;color:var(--text-faint);text-align:center;margin-top:12px;line-height:1.6;}
+
+.success-mask{position:fixed;inset:0;background:rgba(20,20,20,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:24px;}
+.success-mask.show{display:flex;}
+.success-card{background:var(--glass-strong);border-radius:var(--radius);padding:44px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 30px 80px -30px rgba(0,0,0,.4);}
+.success-card .tick{width:72px;height:72px;border-radius:50%;background:var(--accent-bg);display:grid;place-items:center;margin:0 auto 22px;}
+.success-card .tick svg{width:34px;height:34px;stroke:var(--accent);stroke-width:2.4;fill:none;}
+.success-card h3{font-size:22px;font-weight:800;margin:0 0 10px;}
+.success-card p{color:var(--text-dim);font-size:14px;margin:0 0 8px;line-height:1.7;}
+.success-card .order-no{font-weight:700;color:var(--text);}
+.success-card .btn-primary{margin-top:22px;display:inline-flex;}
+
+@media (max-width:900px){
+  .checkout-grid{grid-template-columns:1fr;}
+  .sum-card{position:static;}
+}
+</style>
+<link rel="stylesheet" href="theme-mist.css">
+<!-- 方案 B · 一页之间：出版物皮肤层（最后加载，覆盖以上所有样式） -->
+<link rel="stylesheet" href="spread.css">
+  <link rel="stylesheet" href="pt.css">
+  <script>(function(){try{var f=JSON.parse(sessionStorage.getItem("lumen_pt")||"null");if(f&&Date.now()-f.t<30000){document.documentElement.classList.add("pt-pending");setTimeout(function(){document.documentElement.classList.remove("pt-pending")},3000);}}catch(e){}})();</script>
+</head>
+<body>
+<div id="pt-panel" aria-hidden="true"></div>
+
+<!-- ==================== Header ==================== -->
+<div class="site-header-wrap">
+  <header class="site-header surface" id="siteHeader">
+    <div class="header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">L</span>
+        <span class="logo-text"><b>LUMEN</b><em>Books</em></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">首页</a>
+        <a href="lists.html">书单</a>
+        <a href="market.html">淘书</a>
+        <a href="sell.html">卖书</a>
+        <a href="reviews.html">书话</a>
+      </nav>
+      <div class="header-actions">
+        <div class="nav-user" id="navUser"></div>
+        <a class="btn-primary" href="sell.html" style="padding:10px 22px;">卖书</a>
+        <a class="header-logo" href="index.html" aria-label="LUMEN BOOKS 首页">
+          <img src="assets/logo-mark.png" alt="LUMEN BOOKS">
+        </a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<!-- ==================== Checkout ==================== -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Checkout</p>
+    <div class="section-head">
+      <h2>确认订单</h2>
+      <a class="link-more" href="book.html" id="backLink">返回书籍详情</a>
+    </div>
+
+    <div class="checkout-grid">
+      <!-- 左侧：订单信息 -->
+      <div>
+        <!-- 1. 商品 -->
+        <div class="order-card surface">
+          <p class="block-title"><span class="num">1</span>商品信息</p>
+          <div class="book-row">
+            <div class="book-cover-lg" id="cover"><b id="cvTitle"></b><span id="cvAuthor"></span></div>
+            <div class="book-meta-lg">
+              <h3 id="bkTitle"></h3>
+              <p class="author" id="bkAuthor"></p>
+              <span class="tag" id="bkCond"></span>
+              <span class="tag" id="bkSeller"></span>
+              <div style="margin-top:14px;">
+                <span class="price-lg" id="bkPrice"></span>
+                <span class="orig-lg" id="bkOrig"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 数量 -->
+        <div class="order-card surface">
+          <p class="block-title"><span class="num">2</span>购买数量</p>
+          <div class="qty-row">
+            <span class="q-lbl">二手书库存有限，单笔最多 9 本</span>
+            <div class="qty">
+              <button type="button" id="qtyMinus" aria-label="减少">−</button>
+              <span id="qtyVal">1</span>
+              <button type="button" id="qtyPlus" aria-label="增加">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 配送 -->
+        <div class="order-card surface">
+          <p class="block-title"><span class="num">3</span>配送方式</p>
+          <div class="ship-opts" id="shipOpts">
+            <label class="ship-opt active">
+              <input type="radio" name="ship" value="0" checked>
+              <span class="so-name">普通包邮</span>
+              <span class="so-sub">平台补贴运费</span>
+              <span class="so-fee">¥0</span>
+            </label>
+            <label class="ship-opt">
+              <input type="radio" name="ship" value="6">
+              <span class="so-name">快递加急</span>
+              <span class="so-sub">次日达</span>
+              <span class="so-fee">¥6</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 4. 地址 -->
+        <div class="order-card surface" id="addrCard">
+          <p class="block-title"><span class="num">4</span>收货地址</p>
+          <div id="addrGate" class="login-gate" style="display:none;">
+            请先 <a href="login.html">登录</a> 后填写收货地址并下单
+          </div>
+          <div class="addr-box" id="addrForm">
+            <div class="addr-line"><label>收货人</label><input id="aName" placeholder="请输入姓名"></div>
+            <div class="addr-line"><label>手机号</label><input id="aPhone" placeholder="11 位手机号" inputmode="numeric"></div>
+            <div class="addr-line"><label>地址</label><textarea id="aAddr" rows="2" placeholder="省 / 市 / 区 · 街道门牌"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：订单合计 -->
+      <aside class="sum-card surface">
+        <p class="block-title"><span class="num">¥</span>订单合计</p>
+        <div class="sum-line">单价 <b id="sumUnit"></b></div>
+        <div class="sum-line">数量 <b id="sumQty"></b></div>
+        <div class="sum-line">运费 <b id="sumShip"></b></div>
+        <div class="sum-total">
+          <span class="lab">应付</span>
+          <span class="val" id="sumTotal"></span>
+        </div>
+        <button class="btn-accent btn-block" id="confirmBtn" type="button">提交订单</button>
+        <p class="note">确认收货后平台才向卖家打款<br>演示环境，不会真实扣款</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Success overlay ==================== -->
+<div class="success-mask" id="successMask">
+  <div class="success-card">
+    <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></svg></div>
+    <h3>下单成功</h3>
+    <p>订单已提交，卖家将在 24 小时内为你发货。</p>
+    <p>订单号：<span class="order-no" id="orderNo"></span></p>
+    <a class="btn-primary" href="profile.html?tab=orders" style="display:inline-flex;">查看我的订单</a>
+  </div>
+</div>
+
+<!-- ==================== Footer ==================== -->
+<div class="site-footer-wrap">
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="logo" href="index.html"><span class="logo-mark">L</span><span class="logo-text"><b>LUMEN</b><em>Books</em></span></a>
+        <p>让每一本旧书，遇见下一位读者。面向大学生的二手书流转平台。</p>
+      </div>
+      <div class="footer-cols">
+        <div><h5>逛逛</h5><a href="lists.html">书单</a><a href="market.html">淘书</a><a href="reviews.html#wantedSection">寻书</a><a href="reviews.html">书话</a><a href="sell.html">卖书</a></div>
+        <div><h5>关于</h5><a href="#">平台规则</a><a href="#">品相标准</a><a href="#">联系我们</a></div>
+        <div><h5>账户</h5><a href="login.html">登录 / 注册</a><a href="profile.html">个人中心</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 LUMEN BOOKS</span><span>仅用于学习交流 · 演示环境</span></div>
+  </footer>
+</div>
+
+<script src="auth.js"></script>
+<script src="store.js"></script>
+<script>
+/* 书籍数据与 book.html 同源：统一从 store.js 的 CATALOG 读取 */
+const params = new URLSearchParams(location.search);
+const id = params.get('id') || 'zhishenshizheng';
+const b = Store.getBookDetail(id);
+
+document.getElementById('backLink').href = 'book.html?id=' + encodeURIComponent(id);
+
+/* 渲染商品 */
+var coverEl = document.getElementById('cover');
+coverEl.style.setProperty('--book-bg', b.bg);
+coverEl.style.backgroundImage = "url('" + b.cover + "')";
+var cvt = document.getElementById('cvTitle');
+var cva = document.getElementById('cvAuthor');
+if (cvt) cvt.style.display = 'none';
+if (cva) cva.style.display = 'none';
+document.getElementById('bkTitle').textContent = b.title;
+document.getElementById('bkAuthor').textContent = b.author + ' · ' + b.publisher + ' · ' + b.year;
+document.getElementById('bkCond').textContent = b.cond;
+document.getElementById('bkSeller').textContent = '卖家 ' + b.seller.name + ' · ★' + b.seller.credit;
+document.getElementById('bkPrice').innerHTML = '<small>¥</small>' + b.price;
+document.getElementById('bkOrig').textContent = '定价 ¥' + b.listPrice;
+
+/* 数量 */
+let qty = 1;
+const qtyVal = document.getElementById('qtyVal');
+function setQty(n){ qty = Math.max(1, Math.min(9, n)); qtyVal.textContent = qty; calc(); }
+document.getElementById('qtyMinus').addEventListener('click', () => setQty(qty - 1));
+document.getElementById('qtyPlus').addEventListener('click', () => setQty(qty + 1));
+
+/* 配送 */
+let shipFee = 0;
+document.querySelectorAll('input[name=ship]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.querySelectorAll('.ship-opt').forEach(o => o.classList.remove('active'));
+    r.closest('.ship-opt').classList.add('active');
+    shipFee = +r.value; calc();
+  });
+});
+
+/* 鉴权（与 auth.js 共用 localStorage 键） */
+const SESSION_KEY = 'lumen_session';
+function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; } }
+const session = getSession();
+
+/* 合计计算 */
+function calc(){
+  const subtotal = b.price * qty;
+  const total = subtotal + shipFee;
+  document.getElementById('sumUnit').textContent = '¥' + b.price;
+  document.getElementById('sumQty').textContent = '× ' + qty;
+  document.getElementById('sumShip').textContent = shipFee === 0 ? '包邮' : '¥' + shipFee;
+  document.getElementById('sumTotal').innerHTML = '<small>¥</small>' + total;
+}
+
+/* 地址：未登录隐藏表单并提示 */
+const addrGate = document.getElementById('addrGate');
+const addrForm = document.getElementById('addrForm');
+const confirmBtn = document.getElementById('confirmBtn');
+if (session && session.account) {
+  document.getElementById('aName').value = session.account;
+} else {
+  addrForm.style.display = 'none';
+  addrGate.style.display = 'block';
+  confirmBtn.textContent = '登录后下单';
+}
+
+/* 提交订单 */
+confirmBtn.addEventListener('click', () => {
+  if (!(session && session.account)) { location.href = 'login.html'; return; }
+  const name = document.getElementById('aName').value.trim();
+  const phone = document.getElementById('aPhone').value.trim();
+  const addr = document.getElementById('aAddr').value.trim();
+  if (!name || !phone || !addr) { alert('请填写完整的收货信息'); return; }
+
+  const orderNo = 'LB' + Date.now().toString().slice(-10);
+  document.getElementById('orderNo').textContent = orderNo;
+
+  /* 写入订单，供 profile.html 的「我的订单」与统计数字读取 */
+  try {
+    var orders = JSON.parse(localStorage.getItem('lumen_orders') || '[]');
+    orders.unshift({
+      no: orderNo,
+      bookId: id,
+      qty: qty,
+      total: b.price * qty + shipFee,
+      status: '待发货',
+      name: name,
+      phone: phone,
+      addr: addr,
+      date: new Date().toISOString()
+    });
+    localStorage.setItem('lumen_orders', JSON.stringify(orders));
+  } catch (e) {}
+
+  /* 下单成功后清空购物车里的这本书 */
+  if (window.Store) Store.removeCart(id);
+
+  document.getElementById('successMask').classList.add('show');
+});
+
+calc();
+</script>
+<script src="dock.js"></script>
+<!-- 方案 B · 一页之间：书签绸带 + 跨页刊头 -->
+<script src="spread.js"></script>
+  <script src="pt.js" defer></script>
+</body>
+</html>

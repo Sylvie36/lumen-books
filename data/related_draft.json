@@ -1,0 +1,451 @@
+{
+  "summary": {
+    "counts": {
+      "catalog": 54,
+      "bookwall": 15,
+      "marketCards": 39,
+      "lists": 6,
+      "reviews": 6,
+      "topics": 9,
+      "union": 55,
+      "on": 39,
+      "off": 15,
+      "pending": 1
+    },
+    "coverMissing": [],
+    "bookwallOnly": [
+      "hongloumeng"
+    ],
+    "catalogOnly": [
+      "gaodengshuxue",
+      "kaoyanyingyu",
+      "wannian",
+      "yueliang",
+      "jurenjianshi",
+      "wuyanzhizhong",
+      "aideyishu",
+      "feibaoligoutong",
+      "qinmiiguanxi",
+      "yingxiangli",
+      "wenxin",
+      "xiezuozhehuishi",
+      "fengeganjue",
+      "jinzita",
+      "xuehuiitwen"
+    ],
+    "mismatch": [],
+    "marketIdsNotInCatalog": [],
+    "catalogNotOnMarket": [
+      "gaodengshuxue",
+      "kaoyanyingyu",
+      "wannian",
+      "yueliang",
+      "jurenjianshi",
+      "wuyanzhizhong",
+      "aideyishu",
+      "feibaoligoutong",
+      "qinmiiguanxi",
+      "yingxiangli",
+      "wenxin",
+      "xiezuozhehuishi",
+      "fengeganjue",
+      "jinzita",
+      "xuehuiitwen"
+    ]
+  },
+  "lists": {
+    "1": {
+      "title": "通识经典 · 认识世界的 12 种方式",
+      "curator": "馆员 · 陈老师",
+      "fav": "1.2k",
+      "bookCount": 12,
+      "books": [
+        {
+          "title": "人类简史：从动物到上帝",
+          "author": "尤瓦尔·赫拉利"
+        },
+        {
+          "title": "枪炮、病菌与钢铁",
+          "author": "贾雷德·戴蒙德"
+        },
+        {
+          "title": "置身事内：中国政府与经济发展",
+          "author": "兰小欢"
+        },
+        {
+          "title": "思考，快与慢",
+          "author": "丹尼尔·卡尼曼"
+        },
+        {
+          "title": "乡土中国",
+          "author": "费孝通"
+        },
+        {
+          "title": "社会学的想象力",
+          "author": "C. 赖特·米尔斯"
+        },
+        {
+          "title": "瓦尔登湖",
+          "author": "亨利·戴维·梭罗"
+        },
+        {
+          "title": "百年孤独",
+          "author": "加西亚·马尔克斯"
+        },
+        {
+          "title": "被讨厌的勇气",
+          "author": "岸见一郎 · 古贺史健"
+        },
+        {
+          "title": "人类群星闪耀时",
+          "author": "斯蒂芬·茨威格"
+        },
+        {
+          "title": "万历十五年",
+          "author": "黄仁宇"
+        },
+        {
+          "title": "月亮与六便士",
+          "author": "毛姆"
+        }
+      ]
+    },
+    "2": {
+      "title": "写给年轻人的心理学入门",
+      "curator": "读者 · 苏昀",
+      "fav": "986",
+      "bookCount": 9,
+      "books": [
+        {
+          "title": "被讨厌的勇气",
+          "author": "岸见一郎 · 古贺史健"
+        },
+        {
+          "title": "思考，快与慢",
+          "author": "丹尼尔·卡尼曼"
+        },
+        {
+          "title": "乌合之众",
+          "author": "古斯塔夫·勒庞"
+        },
+        {
+          "title": "爱的艺术",
+          "author": "艾里希·弗洛姆"
+        },
+        {
+          "title": "我们时代的神经症人格",
+          "author": "卡伦·霍妮"
+        },
+        {
+          "title": "自控力",
+          "author": "凯利·麦格尼格尔"
+        },
+        {
+          "title": "非暴力沟通",
+          "author": "马歇尔·卢森堡"
+        },
+        {
+          "title": "亲密关系",
+          "author": "罗兰·米勒"
+        },
+        {
+          "title": "影响力",
+          "author": "罗伯特·西奥迪尼"
+        }
+      ]
+    },
+    "3": {
+      "title": "中文写作与表达力提升书单",
+      "curator": "写作中心 · 联合推荐",
+      "fav": "1.5k",
+      "bookCount": 15,
+      "books": [
+        {
+          "title": "文心",
+          "author": "夏丏尊 · 叶圣陶"
+        },
+        {
+          "title": "写作这回事",
+          "author": "斯蒂芬·金"
+        },
+        {
+          "title": "风格感觉",
+          "author": "史蒂芬·平克"
+        },
+        {
+          "title": "非虚构写作指南",
+          "author": "威廉·津瑟"
+        },
+        {
+          "title": "金字塔原理",
+          "author": "芭芭拉·明托"
+        },
+        {
+          "title": "学会提问",
+          "author": "尼尔·布朗"
+        },
+        {
+          "title": "中式英语之鉴",
+          "author": "琼·平卡姆"
+        },
+        {
+          "title": "修辞学",
+          "author": "亚里士多德"
+        },
+        {
+          "title": "论文写作与学术规范",
+          "author": "李怀祖"
+        },
+        {
+          "title": "演讲的力量",
+          "author": "克里斯·安德森"
+        },
+        {
+          "title": "故事",
+          "author": "罗伯特·麦基"
+        },
+        {
+          "title": "文案训练手册",
+          "author": "约瑟夫·休格曼"
+        },
+        {
+          "title": "写作是门手艺",
+          "author": "刘军强"
+        },
+        {
+          "title": "如何阅读一本书",
+          "author": "莫提默·艾德勒"
+        },
+        {
+          "title": "有效写作",
+          "author": "约翰·比蒂"
+        }
+      ]
+    },
+    "4": {
+      "title": "技术与未来 · 人工智能通识读本",
+      "curator": "读者 · 郑一鸣",
+      "fav": "2.3k",
+      "bookCount": 8,
+      "books": [
+        {
+          "title": "人工智能简史",
+          "author": "尼克"
+        },
+        {
+          "title": "生命 3.0",
+          "author": "迈克斯·泰格马克"
+        },
+        {
+          "title": "AI·未来",
+          "author": "李开复"
+        },
+        {
+          "title": "超级智能",
+          "author": "尼克·波斯特洛姆"
+        },
+        {
+          "title": "人类简史",
+          "author": "尤瓦尔·赫拉利"
+        },
+        {
+          "title": "未来简史",
+          "author": "尤瓦尔·赫拉利"
+        },
+        {
+          "title": "深度学习",
+          "author": "伊恩·古德费洛"
+        },
+        {
+          "title": "算法图解",
+          "author": "阿迪蒂亚·巴尔加瓦"
+        }
+      ]
+    },
+    "5": {
+      "title": "夏日长篇小说 · 读不完的黄昏",
+      "curator": "馆员 · 林筱",
+      "fav": "874",
+      "bookCount": 11,
+      "books": [
+        {
+          "title": "百年孤独",
+          "author": "加西亚·马尔克斯"
+        },
+        {
+          "title": "霍乱时期的爱情",
+          "author": "加西亚·马尔克斯"
+        },
+        {
+          "title": "追风筝的人",
+          "author": "卡勒德·胡赛尼"
+        },
+        {
+          "title": "1984",
+          "author": "乔治·奥威尔"
+        },
+        {
+          "title": "美丽新世界",
+          "author": "阿道司·赫胥黎"
+        },
+        {
+          "title": "局外人",
+          "author": "阿尔贝·加缪"
+        },
+        {
+          "title": "挪威的森林",
+          "author": "村上春树"
+        },
+        {
+          "title": "海边的卡夫卡",
+          "author": "村上春树"
+        },
+        {
+          "title": "杀死一只知更鸟",
+          "author": "哈珀·李"
+        },
+        {
+          "title": "了不起的盖茨比",
+          "author": "菲茨杰拉德"
+        },
+        {
+          "title": "安娜·卡列尼娜",
+          "author": "列夫·托尔斯泰"
+        }
+      ]
+    },
+    "6": {
+      "title": "毕业前想读一遍的十本书",
+      "curator": "读者 · 何叙",
+      "fav": "1.1k",
+      "bookCount": 10,
+      "books": [
+        {
+          "title": "月亮与六便士",
+          "author": "毛姆"
+        },
+        {
+          "title": "麦田里的守望者",
+          "author": "J.D. 塞林格"
+        },
+        {
+          "title": "在路上",
+          "author": "杰克·凯鲁亚克"
+        },
+        {
+          "title": "瓦尔登湖",
+          "author": "亨利·戴维·梭罗"
+        },
+        {
+          "title": "当我谈跑步时我谈些什么",
+          "author": "村上春树"
+        },
+        {
+          "title": "人类群星闪耀时",
+          "author": "斯蒂芬·茨威格"
+        },
+        {
+          "title": "苏东坡传",
+          "author": "林语堂"
+        },
+        {
+          "title": "给青年的十二封信",
+          "author": "朱光潜"
+        },
+        {
+          "title": "悉达多",
+          "author": "赫尔曼·黑塞"
+        },
+        {
+          "title": "小王子",
+          "author": "安东尼·德·圣埃克苏佩里"
+        }
+      ]
+    }
+  },
+  "reviews": {
+    "1": {
+      "bookTitle": "《被讨厌的勇气》",
+      "topics": [
+        5
+      ]
+    },
+    "2": {
+      "bookTitle": "《置身事内》",
+      "topics": [
+        9
+      ]
+    },
+    "3": {
+      "bookTitle": "《百年孤独》",
+      "topics": [
+        3
+      ]
+    },
+    "4": {
+      "bookTitle": "《思考，快与慢》",
+      "topics": [
+        5
+      ]
+    },
+    "5": {
+      "bookTitle": "《瓦尔登湖》",
+      "topics": [
+        6
+      ]
+    },
+    "6": {
+      "bookTitle": "《社会学的想象力》",
+      "topics": [
+        10
+      ]
+    }
+  },
+  "topics": [
+    {
+      "id": 1,
+      "title": "大学四年改变我的书",
+      "tag": "12 本"
+    },
+    {
+      "id": 5,
+      "title": "治愈精神内耗的处方",
+      "tag": "9 本"
+    },
+    {
+      "id": 6,
+      "title": "学会与自己独处",
+      "tag": "8 本"
+    },
+    {
+      "id": 9,
+      "title": "文科生的经济学启蒙",
+      "tag": "10 本"
+    },
+    {
+      "id": 10,
+      "title": "看懂世界的运转逻辑",
+      "tag": "15 本"
+    },
+    {
+      "id": 12,
+      "title": "中文系教授的私藏书单",
+      "tag": "11 本"
+    },
+    {
+      "id": 13,
+      "title": "一口气读完的悬疑神作",
+      "tag": "7 本"
+    },
+    {
+      "id": 15,
+      "title": "被书名耽误的好书",
+      "tag": "6 本"
+    },
+    {
+      "id": 20,
+      "title": "陪我度过低谷的书",
+      "tag": "9 本"
+    }
+  ]
+}

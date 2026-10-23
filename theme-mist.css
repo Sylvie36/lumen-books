@@ -1,0 +1,217 @@
+/* ==========================================================================
+   PAPER · 暖纸白 / 森林绿皮肤
+   --------------------------------------------------------------------------
+   加载顺序：common.css →（各页内联 <style>）→ theme-mist.css
+   本文件在最后加载，用同优先级「后写覆盖」的方式统一改皮，不改动原布局。
+   本次：取消原「照片背景 + 玻璃拟态 + 彩色柔雾纱罩」，
+        改为「暖纸白底 + 纯白纸面 + 浅米灰描边 + 森林绿强调」。
+   色板唯一来源在 common.css 的 --color-*；本文件只做映射与落地。
+   变量名沿用 --glass-*，各页既有引用无需改动。
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. 色板映射：旧变量 → common.css 的 --color-*
+   -------------------------------------------------------------------------- */
+:root{
+  /* 底色：暖纸白 */
+  --bg:var(--color-background);
+  --bg-soft:var(--color-surface-muted);
+
+  /* 纸面层（原「玻璃层」）：实色中性面，不再叠加渐变与模糊 */
+  --glass:var(--color-surface);
+  --glass-strong:var(--color-surface);
+  --glass-soft:var(--color-surface-muted);
+  --glass-chip:var(--color-surface-muted);
+  --glass-edge:var(--color-border);
+  --glass-grad:none;
+  --glass-blur:0px;
+  --glass-blur-sm:0px;
+  --glass-shadow:var(--shadow-card);
+
+  /* 卡片基面 */
+  --surface:var(--color-surface);
+  --surface-elevated:var(--color-surface);
+
+  /* 文字：墨黑 + 中性灰 */
+  --text:var(--color-text-primary);
+  --text-dim:var(--color-text-body);
+  --text-faint:var(--color-text-meta);
+
+  /* 强调色：森林绿（浅绿只用于提示与轻强调） */
+  --accent:var(--color-primary);
+  --accent-hover:var(--color-primary-hover);
+  --accent-light:#B9CFBE;
+  --accent-bg:var(--color-primary-soft);
+
+  --line:var(--color-border);
+  --line-mid:#D8D4C8;
+}
+
+/* --------------------------------------------------------------------------
+   2. 页面背景：暖纸白 + 极轻中性纸纹（无照片、无彩色光晕、无模糊）
+   -------------------------------------------------------------------------- */
+/* 底色画在 html 上，body 保持透明，负 z-index 的纸纹层才能透出来 */
+html{background:var(--color-background);}
+body{background:transparent;}
+
+/* 纸纹层：单色中性颗粒，透明度极低，只提供纸张质感，不影响文字可读性 */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='180'%20height='180'%20filter='url(%23n)'%20opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   3. 卡片与面板：纯白纸面 + 1px 浅米灰描边 + 轻阴影
+   -------------------------------------------------------------------------- */
+.site-header,
+.surface,
+.hero-card,
+.list-card,
+.panel,
+.review-card,
+.reco-card,
+.product-card,
+.step-card,
+.modal,
+.success-card,
+.card-nav-panel,
+.cart-panel{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  box-shadow:var(--shadow-card);
+}
+
+/* 页脚：只做分隔与轻量中性文字，不与主标题和书籍展示争注意力 */
+.site-footer{
+  background:transparent;
+  border:0;
+  border-top:1px solid var(--color-border);
+  border-radius:0;
+  box-shadow:none;
+}
+
+/* 悬浮：纸面轻微上浮，阴影加深但仍保持柔和 */
+.list-card:hover,
+.panel:hover,
+.review-card:hover,
+.reco-card:hover{
+  box-shadow:var(--shadow-card-hover);
+}
+
+/* 页头滚动后保持纯白，避免文字与内容糊在一起 */
+.site-header.scrolled{background:var(--color-surface);}
+
+/* 展开面板里的卡片：墨黑卡面（内部文字为白色，必须有深底才可读） */
+.nav-card{
+  background:var(--color-text-primary);
+  border:1px solid var(--color-text-primary);
+  box-shadow:var(--shadow-card);
+}
+
+/* --------------------------------------------------------------------------
+   4. 中小控件：浅米灰控件底 + 细描边（去掉背景模糊）
+   -------------------------------------------------------------------------- */
+.search-bar,
+.isbn-input,
+.field .input-wrap,
+.field input,
+.field select,
+.field textarea,
+.addr-line input,
+.addr-line textarea,
+.price-range input,
+.setting-row input,
+.ship-option,
+.sync-option,
+.quick-tags a,
+.hot-words a,
+.card-cta button,
+.qty{
+  background:var(--color-surface-muted);
+  border-color:var(--color-border);
+}
+
+/* 筛选胶囊：浅底；选中态由下方 .filter-bar a.active 统一为品牌绿 */
+.filter-bar a{
+  background:var(--color-surface-muted);
+  border-color:var(--color-border);
+}
+
+/* 次要按钮：白底 + 浅米灰边框 + 墨黑文字 */
+.btn-ghost,
+.btn-mini{
+  background:var(--color-surface);
+  border-color:var(--color-border);
+}
+
+/* 小标签 / 徽标：只统一描边，不加模糊 */
+.cond,.badge-ok,.trust-tag,.isbn-tag,.count,.card-head .count,.soldout,
+.cart-head .count,.preview-meta .isbn-tag,.reco-foot .cond-sm,
+.cart-item .info .cond-tag,.code-badge{
+  border-color:var(--color-border);
+}
+
+/* 圆形 / 胶囊按钮：白底 + 浅边框，悬停转为森林绿 */
+.icon-btn,.nav-burger,.btn-login{
+  background:var(--color-surface);
+  border-color:var(--color-border);
+}
+.icon-btn:hover{
+  background:var(--color-primary);
+  border-color:var(--color-primary);
+  color:#fff;
+}
+.btn-login:hover{
+  background:var(--color-primary-soft);
+  border-color:var(--color-primary);
+  color:var(--color-primary);
+}
+
+/* 主按钮：森林绿实心，悬停深森林绿 */
+.btn-primary,.btn-gold,.buy-now,.cart-fab{
+  background:var(--color-primary);
+  border-color:var(--color-primary);
+  box-shadow:0 10px 22px -14px rgba(53,107,74,.55);
+}
+.btn-primary:hover,.btn-gold:hover,.buy-now:hover,.cart-fab:hover{
+  background:var(--color-primary-hover);
+  border-color:var(--color-primary-hover);
+}
+
+/* 选中态胶囊：统一走品牌绿 */
+.filter-bar a.active,
+.nav a.active{
+  background:var(--color-primary);
+  border-color:var(--color-primary);
+  color:#fff;
+}
+
+/* 状态 / 品相标签：浅绿与暖灰，保持低饱和 */
+.cond-new,.status.paid,.tag-ok{background:var(--color-primary-soft);}
+.cond-used{background:#EAEDE2;}
+.cond-old{background:var(--color-surface-muted);}
+.badge-ok,.status.done,.status.cancel,.ship.neutral{background:var(--color-surface-muted);}
+
+/* 输入聚焦：白底 + 品牌绿描边 */
+.search-bar:focus-within,
+.isbn-input:focus-within,
+.field .input-wrap:focus-within,
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.addr-line input:focus,
+.price-range input:focus,
+.setting-row input:focus{
+  background:var(--color-surface);
+  border-color:var(--color-focus);
+}
+
+/* 弹层遮罩：中性墨色，不再做模糊 */
+.overlay,.success-mask{
+  background:rgba(36,39,34,.45);
+}

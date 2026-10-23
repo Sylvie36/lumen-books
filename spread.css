@@ -1,0 +1,973 @@
+/* ==========================================================================
+   THE SPREAD · 一页之间
+   --------------------------------------------------------------------------
+   全站视觉方案 B：整站像一本翻开的独立出版物。
+   两个记忆点：
+     1) 超大中文标题跨页 —— 页头/封面做成「对开跨页」，中间有一条书脊折线，
+        标题用 900 字重宋体撑满整页宽度，页码（folio）与运行头（running head）
+        像刊物一样印在角落；
+     2) 书签绸带贯穿全站 —— 右书口悬着一条朱砂绸带，长度 = 你读到哪（你在哪），
+        旁边的目录尺标出全站章节，点开就是「你收藏了什么」。
+   加载顺序：common.css → nav-ball.css →（各页内联 <style>）→ theme-mist.css → 本文件
+   本文件最后加载，用「同优先级后写覆盖」统一改皮，不改任何页面原有结构。
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap");
+
+/* --------------------------------------------------------------------------
+   1. 令牌：墨黑 + 纸白 + 一枚朱砂
+   -------------------------------------------------------------------------- */
+:root{
+  /* 版面油墨 */
+  --spx-ink:#1B1C18;          /* 正文墨色（标题、细线、页码） */
+  --spx-ink-2:#4A4C43;        /* 次级墨色 */
+  --spx-rule:#D9D4C4;         /* 版面细线 */
+  --spx-rule-soft:#E9E5D8;    /* 更浅的印刷细线 */
+
+  /* 纸面 */
+  --spx-paper:#FCFBF6;        /* 跨页纸面（比纯白更暖） */
+
+  /* 朱砂：全书唯一的第二色，只给「书签绸带」与「收藏」用 */
+  --spx-ribbon:#B4432F;
+  --spx-ribbon-lit:#C74E35;
+  --spx-ribbon-deep:#8C3122;
+
+  /* 字族与版心 */
+  --spx-serif:'Noto Serif SC','Source Han Serif SC','Songti SC','STSong','SimSun',serif;
+  --spx-r:4px;                /* 印刷方角：一律小圆角 */
+  --spx-hair:1px;             /* 细线宽度 */
+
+  /* 层叠：绸带在内容之上、购物车浮钮之下；
+     抽屉打开时要盖住右上角的登录浮标(9000)与购物车，但让开左上角的浮动球(9999) */
+  --spx-z-ribbon:119;
+  --spx-z-scrim:9200;
+  --spx-z-drawer:9300;
+}
+
+/* --------------------------------------------------------------------------
+   2. 纸面：页面正中的书脊折线（宽屏才出现，极淡，只做暗示）
+   -------------------------------------------------------------------------- */
+body::after{
+  content:"";
+  position:fixed;
+  top:0;bottom:0;left:50%;
+  width:var(--spx-hair);
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(27,28,24,0) 0%,
+    rgba(27,28,24,.07) 10%,
+    rgba(27,28,24,.07) 90%,
+    rgba(27,28,24,0) 100%);
+}
+@media (max-width:1279px){ body::after{display:none;} }
+
+/* --------------------------------------------------------------------------
+   3. 标题字：刊物级宋体大标题
+   -------------------------------------------------------------------------- */
+body h1,
+body h2,
+body h3,
+.page-title,
+.article-title,
+.rv-title,
+#bookTitle,
+#userName{
+  font-family:var(--spx-serif);
+  font-weight:900;
+  letter-spacing:-.01em;
+}
+
+/* 页头主标题：撑满整幅、几乎顶到页边 */
+.page-title{
+  font-size:clamp(44px,7.4vw,104px);
+  line-height:.94;
+  margin:0 0 16px;
+  color:var(--spx-ink);
+  letter-spacing:-.03em;
+}
+
+/* 区块标题：标题上方压一条版面细线 + 一枚朱砂书签角 */
+.section-head{
+  border-top:var(--spx-hair) solid var(--spx-rule);
+  padding-top:22px;
+  align-items:flex-start;
+}
+.section-head h2,
+.section h2{
+  font-size:clamp(30px,3.7vw,52px);
+  line-height:1.1;
+  letter-spacing:-.02em;
+  margin:0 0 12px;
+  color:var(--spx-ink);
+}
+.section-head h2::before{
+  content:"";
+  display:block;
+  width:30px;height:4px;
+  margin:0 0 16px;
+  background:var(--spx-ribbon);
+}
+.section-desc{font-size:15.5px;line-height:1.85;color:var(--spx-ink-2);}
+
+/* 页脚分组标题也走刊物体 */
+.footer-cols h5{
+  font-family:var(--spx-serif);
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:.22em;
+  color:var(--spx-ink);
+  margin:0 0 16px;
+}
+
+/* 眉题：印章式短横 + 加大字距 */
+.eyebrow{
+  font-family:var(--spx-serif);
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.34em;
+  color:var(--spx-ink-2);
+}
+.eyebrow::before{width:20px;height:3px;background:var(--spx-ribbon);}
+
+/* --------------------------------------------------------------------------
+   4. 纸面块：卡片一律方角 + 细线，去掉阴影（印刷物不做发光）
+   -------------------------------------------------------------------------- */
+.site-header,
+.surface,
+.hero-card,
+.list-card,
+.panel,
+.review-card,
+.reco-card,
+.product-card,
+.step-card,
+.modal,
+.success-card,
+.card-nav-panel,
+.cart-panel{
+  background:var(--color-surface);
+  border:var(--spx-hair) solid var(--spx-rule);
+  border-radius:var(--spx-r);
+  box-shadow:none;
+}
+
+/* 悬停：只压深描边，不做浮起 */
+.list-card:hover,
+.panel:hover,
+.review-card:hover,
+.reco-card:hover,
+.product-card:hover,
+.surface:hover{
+  box-shadow:none;
+  border-color:#C9C3B0;
+}
+
+/* 控件：印刷方角。
+   圆形控件排除在外：图标按钮 / 汉堡 / 购物车浮钮 / 收藏星 / 浮动球 / 登录页切换页签 / 加减器。
+   页面样式里有不少「多类名后代选择器」把按钮写成 999px 胶囊（如 .card-cta .buy-now），
+   因此这一条用 !important 才能整站压平——只在圆角上使用，不动任何尺寸与颜色。 */
+button:not(.icon-btn):not(.nav-burger):not(.cart-fab):not(.fav-star):not(.nb-trigger):not(.tab-btn):not(.bm-ribbon):not(.bm-close):not(.qty button):not(.cart-del):not(.cart-close),
+.btn-primary,.btn-gold,.buy-now,.add-cart,.btn-ghost,.btn-mini,.btn-login,.btn-register,
+.cart-checkout,.fav-btn,.link-more,
+.filter-bar a,.quick-tags a,.hot-words a,
+.badge,.cond,.badge-ok,.badge-gold,.trust-tag,.price-save,.count{
+  border-radius:2px !important;
+}
+.btn-primary,
+.btn-gold,
+.buy-now,
+.btn-register,
+.cart-checkout{
+  letter-spacing:.08em;
+}
+
+/* 大块容器同样收成方角，保证整本刊物的纸角一致（书籍封面自带书脊圆角，不在此列） */
+.auth-brand,.info-card,.desc-card,.order-card,.estimate-card,.cart-card,.rules-card,
+.flow-mini,.gallery,.summary-card,.address-card,.setting-card,.topic-bar,.wanted-card,
+.sidebar,.results-topbar,.pagination,.step-card,.editor-card,.book-wrap,.sheet{
+  border-radius:var(--spx-r);
+}
+
+/* 购物车 / 收藏：收藏 = 夹书签，统一走朱砂 */
+.fav-star.faved{color:#fff;background:var(--spx-ribbon);}
+.fav-star.faved:hover{background:var(--spx-ribbon-deep);}
+.star-burst{color:var(--spx-ribbon);text-shadow:0 2px 8px rgba(180,67,47,.55);}
+.fav-btn.faved{color:var(--spx-ribbon);border-color:var(--spx-ribbon);}
+
+/* --------------------------------------------------------------------------
+   4.5 页头导航（结算 / 我的书桌 / 副本页）：胶囊 → 文字 + 朱砂下划线
+   -------------------------------------------------------------------------- */
+.nav{gap:26px;}
+.nav a{
+  background:transparent;
+  border:0;
+  border-radius:0;
+  padding:8px 0;
+  position:relative;
+  color:var(--spx-ink-2);
+  letter-spacing:.06em;
+}
+.nav a::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:2px;
+  height:2px;
+  background:var(--spx-ribbon);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .28s cubic-bezier(.22,1,.36,1);
+}
+.nav a:hover,
+.nav a.active{background:transparent;color:var(--spx-ink);}
+.nav a:hover::after,
+.nav a.active::after{transform:none;}
+
+/* --------------------------------------------------------------------------
+   5. 刊头：页头 = 对开跨页（中缝 + 章号 + 运行头 + 页码）
+   -------------------------------------------------------------------------- */
+.page-head{padding:22px 0 12px;}
+
+.page-head-inner{
+  position:relative;
+  isolation:isolate;                 /* 让装饰层落在纸面之上、文字之下 */
+  overflow:hidden;
+  /* 上留白要够：左上角常驻的浮动球会盖到 x≈24-76 的位置 */
+  padding:56px 48px 44px;
+  background:var(--spx-paper);
+  border:var(--spx-hair) solid var(--spx-rule);
+  border-radius:var(--spx-r);
+  box-shadow:none;
+}
+
+/* 中缝：一条墨线 + 两侧折缝暗影，整页像摊开的对开本 */
+.page-head-inner::before{
+  content:"";
+  position:absolute;
+  top:22px;bottom:22px;left:50%;
+  width:var(--spx-hair);
+  z-index:-1;
+  background:linear-gradient(180deg,
+    rgba(27,28,24,0),rgba(27,28,24,.20) 12%,
+    rgba(27,28,24,.20) 88%,rgba(27,28,24,0));
+}
+.page-head-inner::after{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:50%;
+  width:72px;
+  transform:translateX(-50%);
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(27,28,24,0),rgba(27,28,24,.045) 50%,rgba(27,28,24,0));
+}
+
+/* 运行头：刊物名字 + 期号 + 页码（由 spread.js 注入）
+   注意：卖书页的刊头是 grid（1fr auto），运行头必须横跨整行，否则会挤掉原有的两栏 */
+.spx-run{
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  margin:0 0 26px;
+  font-size:11px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--color-text-meta);
+}
+.spx-run b{
+  font-family:var(--spx-serif);
+  font-weight:700;
+  letter-spacing:.26em;
+  color:var(--spx-ink);
+}
+.spx-run .spx-run-rule{
+  flex:1 1 40px;
+  min-width:30px;
+  height:var(--spx-hair);
+  background:var(--spx-rule);
+}
+.spx-run i{
+  font-style:normal;
+  color:var(--spx-ribbon);
+  letter-spacing:.2em;
+}
+
+/* 章号：一枚巨大的浅墨数字 + 竖排章名，压在右页角落 */
+.spx-chap{
+  position:absolute;
+  right:34px;
+  top:64px;                          /* 让开上方的运行头 */
+  z-index:-1;
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  pointer-events:none;
+}
+.spx-chap-no{
+  font-family:var(--spx-serif);
+  font-size:clamp(72px,9.4vw,140px);
+  font-weight:900;
+  line-height:.78;
+  letter-spacing:-.06em;
+  color:rgba(27,28,24,.075);
+}
+.spx-chap-name{
+  writing-mode:vertical-rl;
+  font-family:var(--spx-serif);
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:.5em;
+  color:rgba(27,28,24,.34);
+  padding-top:6px;
+}
+
+/* 无刊头的页面（结算 / 我的书桌 / 登录）：一条细刊头带 */
+.spx-band{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  width:100%;
+  margin:18px auto 0;
+  padding:14px 0;
+  border-top:var(--spx-hair) solid var(--spx-rule);
+  border-bottom:var(--spx-hair) solid var(--spx-rule);
+  font-size:11px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--color-text-meta);
+}
+.spx-band b{font-family:var(--spx-serif);font-weight:700;letter-spacing:.26em;color:var(--spx-ink);}
+.spx-band .spx-run-rule{flex:1 1 40px;min-width:30px;height:var(--spx-hair);background:var(--spx-rule);}
+.spx-band i{font-style:normal;color:var(--spx-ribbon);letter-spacing:.2em;}
+@media (max-width:640px){
+  .spx-band{width:min(100% - 32px,1200px);}
+}
+
+/* --------------------------------------------------------------------------
+   6. 封面：首页 Hero = 一整幅跨页（中缝 + 超大中文标题 + 左右页码）
+   -------------------------------------------------------------------------- */
+.hero{padding-top:26px;}
+
+.hero-card{
+  position:relative;
+  isolation:isolate;                 /* 装饰层在纸面之上、标题之下 */
+  overflow:hidden;
+  padding:56px 56px 44px;
+  min-height:auto;
+  background:var(--spx-paper);
+  border:var(--spx-hair) solid var(--spx-rule);
+  border-radius:var(--spx-r);
+  box-shadow:none;
+}
+
+/* 中缝折线 + 折缝暗影：把封面切成左右两页 */
+.hero-card::before{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:50%;
+  width:var(--spx-hair);
+  z-index:-1;
+  background:linear-gradient(180deg,
+    rgba(27,28,24,.04),rgba(27,28,24,.22) 10%,
+    rgba(27,28,24,.22) 90%,rgba(27,28,24,.04));
+}
+.hero-card::after{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:50%;
+  width:96px;
+  transform:translateX(-50%);
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(27,28,24,0),rgba(27,28,24,.05) 50%,rgba(27,28,24,0));
+}
+
+/* 封面排版：标题独占上半幅并跨过中缝，书堆压在下半幅 */
+.hero-inner{
+  display:block;
+  width:100%;
+  flex:1 1 auto;
+  min-height:0;
+}
+.hero-copy{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:none;
+  text-align:left;
+}
+.hero-title{
+  font-size:clamp(30px,10vw,148px);
+  font-weight:900;
+  line-height:.98;
+  letter-spacing:-.03em;
+  color:var(--spx-ink);
+  margin:0;
+}
+.hero-visual{
+  position:relative;
+  z-index:3;
+  margin-top:clamp(4px,1.6vw,24px);
+  align-items:center;
+  justify-content:center;
+}
+.hero-visual .card-swap{
+  width:min(100%,440px);
+  height:min(50vh,500px);
+}
+
+/* 角上的页码：像刊物一样印在左右下角 */
+.spx-folio{
+  position:absolute;
+  bottom:16px;
+  z-index:2;
+  font-family:var(--spx-serif);
+  font-size:11.5px;
+  letter-spacing:.3em;
+  color:var(--color-text-meta);
+  pointer-events:none;
+}
+.spx-folio--l{left:30px;}
+.spx-folio--r{right:30px;}
+
+/* 封面运行头（跨在标题上方的一行小字） */
+.spx-cover-run{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  margin:0 0 26px;
+  font-size:11px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--color-text-meta);
+}
+.spx-cover-run b{font-family:var(--spx-serif);font-weight:700;letter-spacing:.26em;color:var(--spx-ink);}
+.spx-cover-run .spx-run-rule{flex:1 1 40px;min-width:30px;height:var(--spx-hair);background:var(--spx-rule);}
+.spx-cover-run i{font-style:normal;color:var(--spx-ribbon);letter-spacing:.2em;}
+
+/* --------------------------------------------------------------------------
+   7. 页脚：刊物版权页
+   -------------------------------------------------------------------------- */
+.site-footer-wrap{
+  border-top:var(--spx-hair) solid var(--spx-rule);
+  margin-top:64px;
+}
+.site-footer{background:transparent;border:0;box-shadow:none;border-radius:0;}
+.footer-inner{gap:56px;}
+.footer-bottom{
+  border-top:var(--spx-hair) solid var(--spx-rule-soft);
+  padding-top:18px;
+  font-size:12px;
+  letter-spacing:.08em;
+}
+
+/* 版权页小字（由 spread.js 注入） */
+.spx-colophon{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  padding:22px 0 0;
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--color-text-meta);
+}
+.spx-colophon b{font-family:var(--spx-serif);font-weight:700;color:var(--spx-ink);letter-spacing:.22em;}
+.spx-colophon i{font-style:normal;color:var(--spx-ribbon);}
+.spx-colophon .spx-run-rule{flex:1 1 40px;min-width:30px;height:var(--spx-hair);background:var(--spx-rule-soft);}
+
+/* --------------------------------------------------------------------------
+   8. 书签绸带：你在哪 / 你收藏了什么
+   -------------------------------------------------------------------------- */
+.bm-root{
+  position:fixed;
+  top:0;right:0;
+  width:0;height:0;
+  z-index:var(--spx-z-ribbon);
+}
+
+/* 目录尺：全站章节沿右书口排成一列 */
+.bm-rail{
+  position:absolute;
+  top:86px;right:29px;
+  width:var(--spx-hair);
+  height:calc(100vh - 172px);
+  background:linear-gradient(180deg,
+    rgba(27,28,24,.02),rgba(27,28,24,.22) 8%,
+    rgba(27,28,24,.22) 92%,rgba(27,28,24,.02));
+  pointer-events:none;
+}
+.bm-nav{
+  position:absolute;
+  top:86px;right:29px;
+  width:0;
+  height:calc(100vh - 172px);
+}
+.bm-tick{
+  position:absolute;
+  right:0;
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+  gap:9px;
+  text-decoration:none;
+  color:inherit;
+  pointer-events:auto;
+  opacity:.72;
+  transition:opacity .25s;
+}
+.bm-tick:hover{opacity:1;}
+.bm-tick-mark{
+  display:block;
+  width:9px;height:var(--spx-hair);
+  background:rgba(27,28,24,.42);
+  transition:width .28s ease,height .28s ease,background .28s ease;
+}
+.bm-tick-name{
+  writing-mode:vertical-rl;
+  font-family:var(--spx-serif);
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.28em;
+  color:var(--color-text-meta);
+  opacity:0;
+  transform:translateX(6px);
+  transition:opacity .3s ease,transform .3s ease,color .3s ease;
+  white-space:nowrap;
+}
+.bm-tick:hover .bm-tick-mark{width:22px;background:var(--spx-ink);}
+.bm-tick:hover .bm-tick-name{opacity:1;transform:none;color:var(--spx-ink);}
+/* 当前章节：一整条朱砂刻度一直亮着 —— 你在哪 */
+.bm-tick.active{opacity:1;}
+.bm-tick.active .bm-tick-mark{width:26px;height:2px;background:var(--spx-ribbon);}
+.bm-tick.active .bm-tick-name{opacity:1;transform:none;color:var(--spx-ribbon);}
+.bm-tick.active:hover .bm-tick-mark{width:30px;}
+
+/* 绸带本体：从书口顶端垂下来，长度 = 阅读进度 */
+.bm-ribbon{
+  position:absolute;
+  top:0;right:-10px;
+  width:40px;                        /* 命中区域比绸带本身宽，方便点击 */
+  height:var(--bm-len,120px);
+  padding:0;border:0;
+  background:transparent;
+  cursor:pointer;
+  pointer-events:auto;
+  -webkit-tap-highlight-color:transparent;
+}
+/* 绸带本体：右边缘贴住书口（按钮自身往右溢出 10px，故这里补回 10px） */
+.bm-cloth{
+  position:absolute;
+  top:0;right:10px;
+  width:26px;
+  height:100%;
+  background:linear-gradient(180deg,var(--spx-ribbon-lit) 0%,var(--spx-ribbon) 42%,var(--spx-ribbon-deep) 100%);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),50% 100%,0 calc(100% - 14px));
+  box-shadow:0 12px 26px -16px rgba(140,49,34,.75);
+  transition:width .25s ease,filter .25s ease;
+}
+.bm-cloth::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,rgba(255,255,255,.22),rgba(255,255,255,0) 44%,rgba(0,0,0,.16));
+  pointer-events:none;
+}
+.bm-cloth-text{
+  position:absolute;
+  top:50%;left:0;right:0;
+  transform:translateY(-50%);
+  writing-mode:vertical-rl;
+  text-align:center;
+  font-family:var(--spx-serif);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.34em;
+  color:rgba(255,255,255,.95);
+  pointer-events:none;
+}
+.bm-cloth-pct{
+  position:absolute;
+  bottom:24px;left:0;right:0;
+  text-align:center;
+  font-size:9px;
+  letter-spacing:.04em;
+  color:rgba(255,255,255,.82);
+  font-variant-numeric:tabular-nums;
+  pointer-events:none;
+}
+.bm-ribbon:hover .bm-cloth,
+.bm-ribbon:focus-visible .bm-cloth{width:30px;filter:brightness(1.06);}
+
+/* 落带动画：进页面时绸带自己垂下来 */
+@keyframes bm-drop{from{height:0;}to{height:100%;}}
+.bm-ribbon.drop .bm-cloth{animation:bm-drop .9s cubic-bezier(.22,1,.36,1) both;}
+
+/* 悬停小提示 */
+.bm-tip{
+  position:absolute;
+  bottom:8px;right:46px;
+  padding:7px 12px;
+  background:var(--spx-ink);
+  color:#fff;
+  font-family:var(--spx-serif);
+  font-size:11.5px;
+  letter-spacing:.14em;
+  white-space:nowrap;
+  border-radius:2px;
+  opacity:0;
+  transform:translateX(6px);
+  pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease;
+}
+.bm-tip.show{opacity:1;transform:none;}
+.bm-tip i{font-style:normal;color:#E8A796;}
+
+/* ---------------- 抽屉：目录 + 收藏 ---------------- */
+.bm-scrim{
+  position:fixed;
+  inset:0;
+  z-index:var(--spx-z-scrim);
+  background:rgba(27,28,24,.34);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+}
+.bm-scrim.open{opacity:1;pointer-events:auto;}
+
+.bm-drawer{
+  position:fixed;
+  top:0;right:0;
+  z-index:var(--spx-z-drawer);
+  width:min(392px,92vw);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:var(--spx-paper);
+  border-left:var(--spx-hair) solid var(--spx-rule);
+  box-shadow:-30px 0 70px -34px rgba(27,28,24,.45);
+  transform:translateX(102%);
+  transition:transform .42s cubic-bezier(.22,1,.36,1);
+}
+.bm-drawer.open{transform:none;}
+/* 抽屉左侧也压一条朱砂细边，像是从绸带里抽出来的一叠纸 */
+.bm-drawer::before{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:0;
+  width:4px;
+  background:linear-gradient(180deg,var(--spx-ribbon-lit),var(--spx-ribbon-deep));
+}
+
+.bm-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:26px 24px 20px 28px;
+  border-bottom:var(--spx-hair) solid var(--spx-rule);
+}
+.bm-head-title{
+  font-family:var(--spx-serif);
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.01em;
+  margin:0 0 6px;
+  color:var(--spx-ink);
+}
+.bm-head-sub{
+  margin:0;
+  font-size:11px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--color-text-meta);
+}
+.bm-head-sub i{font-style:normal;color:var(--spx-ribbon);}
+.bm-close{
+  flex:none;
+  width:34px;height:34px;
+  border:var(--spx-hair) solid var(--spx-rule);
+  border-radius:2px;
+  background:var(--color-surface);
+  color:var(--spx-ink);
+  font-size:18px;line-height:1;
+  cursor:pointer;
+  transition:.2s;
+}
+.bm-close:hover{background:var(--spx-ink);color:#fff;border-color:var(--spx-ink);}
+
+.bm-body{
+  flex:1 1 auto;
+  overflow-y:auto;
+  padding:24px 24px 40px 28px;
+  display:flex;
+  flex-direction:column;
+  gap:30px;
+}
+.bm-sec-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:10px;
+  margin-bottom:16px;
+  border-bottom:var(--spx-hair) solid var(--spx-rule);
+  font-family:var(--spx-serif);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.28em;
+  color:var(--spx-ink);
+}
+.bm-sec-head span{
+  font-family:var(--sans);
+  font-size:11px;
+  font-weight:400;
+  letter-spacing:.14em;
+  color:var(--color-text-meta);
+}
+
+/* 你在哪：章节清单 */
+.bm-chapters{display:flex;flex-direction:column;}
+.bm-chap{
+  display:grid;
+  grid-template-columns:38px 1fr auto;
+  align-items:baseline;
+  gap:12px;
+  padding:13px 2px;
+  border-bottom:var(--spx-hair) solid var(--spx-rule-soft);
+  text-decoration:none;
+  color:var(--spx-ink);
+  transition:.22s;
+}
+.bm-chap-no{
+  font-family:var(--spx-serif);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.06em;
+  color:var(--color-text-meta);
+}
+.bm-chap-name{
+  font-family:var(--spx-serif);
+  font-size:19px;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.bm-chap-meta{
+  font-size:11px;
+  letter-spacing:.16em;
+  color:var(--color-text-meta);
+  text-transform:uppercase;
+}
+.bm-chap:hover{background:rgba(27,28,24,.04);padding-left:8px;padding-right:6px;}
+.bm-chap.active{
+  border-bottom-color:transparent;
+  box-shadow:inset 3px 0 0 var(--spx-ribbon);
+  background:rgba(180,67,47,.055);
+  padding-left:12px;
+  padding-right:6px;
+}
+.bm-chap.active .bm-chap-no,
+.bm-chap.active .bm-chap-meta{color:var(--spx-ribbon);}
+.bm-chap.active .bm-chap-name{color:var(--spx-ribbon);}
+
+/* 读到哪：进度 */
+.bm-progress{margin-top:4px;}
+.bm-progress-bar{
+  height:3px;
+  background:var(--spx-rule-soft);
+  overflow:hidden;
+}
+.bm-progress-fill{
+  display:block;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--spx-ribbon-lit),var(--spx-ribbon-deep));
+  transition:width .18s linear;
+}
+.bm-progress-text{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:10px;
+  font-size:11.5px;
+  letter-spacing:.12em;
+  color:var(--color-text-meta);
+}
+.bm-progress-text b{
+  font-family:var(--spx-serif);
+  font-weight:700;
+  color:var(--spx-ink);
+  letter-spacing:.1em;
+}
+
+/* 你收藏了什么 */
+.bm-favs{display:flex;flex-direction:column;gap:14px;}
+.bm-fav{
+  display:grid;
+  grid-template-columns:38px 1fr auto;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  color:var(--spx-ink);
+  transition:.22s;
+}
+.bm-fav:hover{transform:translateX(3px);}
+.bm-fav-cover{
+  width:38px;height:52px;
+  background-color:#111;
+  background-size:cover;
+  background-position:center;
+  border-radius:2px 6px 6px 2px;
+  box-shadow:0 8px 16px -12px rgba(27,28,24,.6);
+}
+.bm-fav-title{
+  font-family:var(--spx-serif);
+  font-size:14.5px;
+  font-weight:700;
+  line-height:1.4;
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.bm-fav-author{
+  display:block;
+  margin-top:3px;
+  font-size:11.5px;
+  letter-spacing:.06em;
+  color:var(--color-text-meta);
+}
+.bm-fav-price{
+  font-family:var(--spx-serif);
+  font-size:14px;
+  font-weight:700;
+  color:var(--spx-ribbon);
+  white-space:nowrap;
+}
+.bm-empty{
+  padding:18px 0;
+  font-size:13px;
+  line-height:1.9;
+  color:var(--color-text-meta);
+}
+.bm-empty a{color:var(--spx-ribbon);font-weight:700;}
+.bm-more{
+  display:inline-block;
+  margin-top:14px;
+  font-size:11.5px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--spx-ink);
+  border-bottom:var(--spx-hair) solid var(--spx-ink);
+  padding-bottom:3px;
+  text-decoration:none;
+}
+.bm-more:hover{color:var(--spx-ribbon);border-color:var(--spx-ribbon);}
+
+/* 袋子 + 版权行 */
+.bm-foot{
+  padding:16px 24px 20px 28px;
+  border-top:var(--spx-hair) solid var(--spx-rule);
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--color-text-meta);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.bm-foot a{color:var(--spx-ink);text-decoration:none;border-bottom:var(--spx-hair) solid var(--spx-rule);padding-bottom:2px;}
+.bm-foot a:hover{color:var(--spx-ribbon);border-color:var(--spx-ribbon);}
+
+/* 收藏变动时绸带抖一下 */
+@keyframes bm-shake{
+  0%,100%{transform:translateX(0) rotate(0);}
+  30%{transform:translateX(-3px) rotate(-1.2deg);}
+  65%{transform:translateX(2px) rotate(.8deg);}
+}
+.bm-root.shake .bm-cloth{animation:bm-shake .55s ease;}
+
+/* --------------------------------------------------------------------------
+   9. 响应式
+   -------------------------------------------------------------------------- */
+@media (max-width:1080px){
+  .hero-card{padding:40px 36px 32px;}
+  .page-head-inner{padding:38px 34px 34px;}
+  .spx-chap{right:24px;top:26px;}
+  .spx-folio--l{left:22px;}
+  .spx-folio--r{right:22px;}
+}
+@media (max-width:900px){
+  .hero-card{padding:34px 24px 26px;}
+  .hero-card::after,.page-head-inner::after{display:none;}
+  .hero-visual .card-swap{height:min(46vh,420px);}
+  /* 中缝在窄屏会让标题读起来割裂，收成一条更淡的暗示 */
+  .hero-card::before,
+  .page-head-inner::before{opacity:.55;}
+}
+@media (max-width:768px){
+  /* 左上角浮动球与右上角登录入口都是 fixed，窄屏会正好压在刊头上的运行头上，整页下移让开 */
+  .page-head{padding-top:72px;}
+  .hero{padding-top:72px;}
+  .hero-card{padding:28px 20px 22px;}
+  .page-head-inner{padding:20px 20px 26px;}
+  .page-title{font-size:clamp(38px,11.5vw,64px);}
+  .section-head h2,.section h2{font-size:clamp(26px,7vw,38px);}
+  /* 窄屏目录尺只留刻度：竖排章名会压在正文上 */
+  .bm-rail,.bm-nav{right:17px;}
+  .bm-tick-mark{width:7px;}
+  .bm-tick:hover .bm-tick-mark{width:12px;}
+  .bm-tick.active .bm-tick-mark{width:14px;}
+  .bm-tick-name{display:none;}
+  /* 窄屏运行头会折行，章号改到刊头右下角，不再和文字抢位置 */
+  .spx-chap{right:16px;top:auto;bottom:12px;gap:10px;align-items:flex-end;}
+  .spx-chap-no{font-size:54px;}
+  .spx-chap-name{font-size:11px;letter-spacing:.4em;padding-top:0;}
+  .spx-folio{bottom:12px;font-size:10.5px;letter-spacing:.22em;}
+  .spx-folio--l{left:16px;}
+  .spx-folio--r{right:16px;}
+  /* 绸带变细，仍然贴住书口 */
+  .bm-ribbon{right:-8px;width:32px;}
+  .bm-cloth{right:8px;width:24px;}
+  .bm-cloth-text{font-size:10px;letter-spacing:.26em;}
+  .bm-ribbon:hover .bm-cloth,
+  .bm-ribbon:focus-visible .bm-cloth{width:24px;}
+  .bm-rail,.bm-nav{right:21px;}
+  .bm-tip{display:none;}
+  .bm-drawer{width:min(340px,94vw);}
+  .bm-body{padding:20px 18px 32px 22px;}
+  .bm-head{padding:22px 18px 16px 22px;}
+  .bm-foot{padding:14px 18px 18px 22px;}
+  .bm-chap{grid-template-columns:32px 1fr auto;}
+  .bm-chap-name{font-size:17px;}
+}
+@media (max-width:640px){
+  .hero-title{font-size:clamp(28px,10.4vw,44px);}
+  .spx-folio{display:none;}
+  .spx-cover-run,.spx-run{letter-spacing:.18em;font-size:10px;}
+}
+
+/* --------------------------------------------------------------------------
+   10. 减少动态效果
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  .bm-cloth,
+  .bm-tick-mark,
+  .bm-tick-name,
+  .bm-drawer,
+  .bm-scrim,
+  .bm-tip,
+  .bm-progress-fill{transition:none;}
+  .bm-ribbon.drop .bm-cloth{animation:none;}
+  .bm-root.shake .bm-cloth{animation:none;}
+}

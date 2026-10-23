@@ -1,0 +1,61 @@
+/* ==========================================================================
+   PT · Curtain 页面转场（零依赖）
+   一个全屏面板，用 translateY 移动：
+   - 前进离开：面板自底部(100%)升起到覆盖(0)，内容上漂淡出 → 跳转；
+   - 前进进入：面板停留覆盖，随后继续升出顶部(-100%)，新内容延迟 0.2s 漂入；
+   - 返回：全程反向，自上而下。
+   全部状态用 CSS 类驱动（不用内联样式，避免优先级覆盖动画）。
+   ========================================================================== */
+#pt-panel{
+  position:fixed;inset:0;z-index:9999;
+  background:
+    radial-gradient(120% 90% at 50% 110%, rgba(255,255,255,.10), rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, #2D5A3D, #1F5A3D 55%, #173F2C);
+  transform:translateY(100%);          /* 默认停在屏幕下方之外 */
+  pointer-events:none;
+  will-change:transform;
+}
+#pt-panel::after{
+  content:'LUMEN BOOKS';
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  color:#F7F4EC;font-size:13px;font-weight:800;
+  letter-spacing:.42em;text-indent:.42em;opacity:.85;
+  white-space:nowrap;
+}
+
+/* 转场进入前：首帧绘制前即由幕布盖住内容（内联脚本加 .pt-pending） */
+html.pt-pending body{opacity:0;}
+html.pt-pending #pt-panel{transform:translateY(0);}
+
+/* 过渡只在 .pt-anim 下开启 */
+html.pt-anim #pt-panel{transition:transform .55s cubic-bezier(.65,0,.35,1);}
+html.pt-anim body{transition:transform .55s cubic-bezier(.65,0,.35,1), opacity .45s ease;}
+
+/* —— 离开（前进）：面板自底升起到覆盖，内容上漂 —— */
+html.pt-leave #pt-panel{transform:translateY(0);}
+html.pt-leave body{transform:translateY(-60px);opacity:0;}
+
+/* —— 进入起点（前进）：面板覆盖、内容停在下方透明（无过渡，下一帧切到终点） —— */
+html.pt-enter-prep #pt-panel{transform:translateY(0);}
+html.pt-enter-prep body{transform:translateY(60px);opacity:0;}
+
+/* —— 进入终点（前进）：面板升出顶部，内容延迟 0.2s 漂入 —— */
+html.pt-enter #pt-panel{transform:translateY(-100%);}
+html.pt-enter body{transform:translateY(0);opacity:1;transition-delay:.2s;}
+
+/* —— 返回：全程反向（面板自顶而降、向底离去） —— */
+html.pt-leave-back #pt-panel{transform:translateY(0);}
+html.pt-leave-back body{transform:translateY(60px);opacity:0;}
+html.pt-enter-prep-back #pt-panel{transform:translateY(0);}
+html.pt-enter-prep-back body{transform:translateY(-60px);opacity:0;}
+html.pt-enter-back #pt-panel{transform:translateY(100%);}
+html.pt-enter-back body{transform:translateY(0);opacity:1;transition-delay:.2s;}
+
+/* 减少动效：完全跳过转场 */
+@media (prefers-reduced-motion: reduce){
+  #pt-panel{display:none;}
+  html.pt-anim #pt-panel,
+  html.pt-anim body{transition:none;}
+  html.pt-leave body, html.pt-leave-back body{transform:none;opacity:1;}
+}

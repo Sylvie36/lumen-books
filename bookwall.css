@@ -1,0 +1,495 @@
+/* ==========================================================================
+   BOOKWALL · 首页 3D 书墙
+   每本书 = 封面 + 书脊 + 纸页 + 书背 + 纸页顶面 的完整 CSS 3D 对象。
+   数据 / 渲染 / 交互见 bookwall.js。最后加载，覆盖首页内联样式。
+   ========================================================================== */
+
+/* 容器：标题下方整幅区域
+   --lx/--ly：光源位置(0~1)，桌面端由 bookwall.js 跟随指针驱动；
+   --srx/--sry：场景俯仰/偏航角，桌面端由指针视差驱动。 */
+.bw {
+  position: relative;
+  width: 100%;
+  --lx: 0.5;
+  --ly: 0.32;
+  --srx: 0deg;
+  --sry: 0deg;
+}
+
+/* 书墙视口：perspective 与“地面” */
+.bw-shelf {
+  position: relative;
+  height: 340px;
+  margin-top: 10px;
+  perspective: 1300px;
+  perspective-origin: 50% 28%;
+  transform-style: flat;
+}
+
+/* 地面接触阴影带（整幅 subtle 渐变） */
+.bw-shelf::before {
+  content: '';
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  bottom: 18px;
+  height: 34px;
+  background: radial-gradient(55% 100% at 50% 50%, rgba(30, 34, 27, .16), rgba(30, 34, 27, 0) 72%);
+  pointer-events: none;
+}
+
+/* ---------------- 单本书 ----------------
+   最终位姿 = 横向位置(--x) + 纵向浅弧(--lift) + 错落(--ty/--ry) + 纵深(--arc-z/--z)。
+   --lift/--arc-z/--cs/--bri 由 bookwall.js 的 layout() 确定性计算写入
+   （对称浅弧：弧顶居中，抬高 + 前突 + 略大 + 略亮；--arc-z 取正值，
+   使 z 恒 ≥ 0，规避 Chromium 负 z 平面命中丢失问题）。 */
+.bw-book {
+  position: absolute;
+  bottom: 34px;
+  left: 0;                 /* JS 设置 --x 后用 transform 平移 */
+  width: var(--w);
+  height: var(--h);
+  display: block;
+  text-decoration: none;
+  transform:
+    translateX(var(--x))
+    translateY(calc(var(--ty, 0px) + var(--lift, 0px)))
+    translateZ(calc(var(--arc-z, 0px) + var(--z, 0px)))
+    rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.22, 1, .36, 1);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+/* 悬停 / 触摸选中：当前书沿倾斜平面的法线向观察者抽出、立正、微抬
+   突出幅度按现有书尺寸收敛（translateZ 96→52、lift 22→14、scale 1.06→1.04），
+   避免大幅前突导致相邻封面互相遮挡。 */
+.bw-book:hover,
+.bw-book:focus-visible,
+.bw-book.active {
+  transform:
+    translateX(var(--x))
+    translateY(calc(var(--ty, 0px) + var(--lift, 0px) - 14px))
+    translateZ(calc(var(--arc-z, 0px) + var(--z, 0px) + 52px))
+    rotateY(calc(var(--ry, 0deg) * 0.28))
+    scale(1.04);
+  z-index: 60 !important;   /* layout() 会写内联 z-index，悬停必须强制置顶 */
+}
+
+/* 书的 3D 内胆（悬停变换作用于外层 .bw-book，尺寸缩放统一在这里做）。
+   --scale 由响应式断点写入，平板/手机整体缩小书本；--cs 为浅弧层叠缩放
+   （弧顶最大 1.0、两侧 0.90），与响应式缩放相乘；布局坐标在 bookwall.js 中
+   按 --scale 反算，保证视觉书距连续。 */
+.bw-inner {
+  position: absolute;
+  inset: 0;
+  transform: scale(calc(var(--scale, 1) * var(--cs, 1)));
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.22, 1, .36, 1);
+  will-change: transform;
+}
+
+/* 所有面共用 */
+.bw-face {
+  position: absolute;
+  display: block;
+  backface-visibility: hidden;
+}
+
+/* 正面封面 */
+.bw-front {
+  inset: 0;
+  transform: translateZ(calc(var(--t) / 2));
+  border-radius: 3px 5px 5px 3px;
+  overflow: hidden;
+  background: #222;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+}
+.bw-front img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: brightness(var(--bri, 1));
+  transition: filter .55s cubic-bezier(.22, 1, .36, 1);
+}
+/* 悬停抽出时亮度回弹，呼应“从层叠中取出” */
+.bw-book:hover .bw-front img,
+.bw-book:focus-visible .bw-front img,
+.bw-book.active .bw-front img {
+  filter: brightness(calc(var(--bri, 1) * 1.08));
+}
+/* 封面受光：镜面高光跟随光源(--lx/--ly) + 左缘书脊侧压暗、右缘纸页侧微亮 + 顶部天光 */
+.bw-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(130% 100% at calc(var(--lx) * 100%) calc(var(--ly) * 100%),
+      rgba(255, 255, 255, .30), rgba(255, 255, 255, 0) 54%),
+    linear-gradient(90deg, rgba(20, 16, 10, .30), rgba(20, 16, 10, 0) 16%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 88%, rgba(255, 255, 255, .10)),
+    linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0) 14%);
+  pointer-events: none;
+}
+/* 悬停光泽：一道斜向光带扫过封面（动画驱动，移出后不回放） */
+.bw-front::before {
+  content: '';
+  position: absolute;
+  inset: -42%;
+  background: linear-gradient(105deg,
+    rgba(255, 255, 255, 0) 42%,
+    rgba(255, 255, 255, .32) 50%,
+    rgba(255, 255, 255, 0) 58%);
+  transform: translateX(-72%) skewX(-14deg);
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes bw-gloss {
+  0%   { opacity: 0; transform: translateX(-72%) skewX(-14deg); }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(72%) skewX(-14deg); }
+}
+.bw-book:hover .bw-front::before,
+.bw-book:focus-visible .bw-front::before,
+.bw-book.active .bw-front::before {
+  animation: bw-gloss .9s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+/* 书脊（左侧面，竖排书名） */
+.bw-spine {
+  top: 50%;
+  left: 0;
+  width: var(--t);
+  height: var(--h);
+  margin-top: calc(var(--h) / -2);
+  transform: rotateY(-90deg) translateZ(calc(var(--t) / 2));
+  border-radius: 3px 0 0 3px;
+  background:
+    radial-gradient(150% 80% at calc(var(--lx) * 100%) -10%,
+      rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 58%),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, .16),
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, .30));
+  background-color: var(--spine);
+  color: rgba(250, 247, 240, .92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 14%;
+  gap: 8px;
+}
+/* 浅色书脊（米白书）改用墨色字 */
+.bw-book[data-light="1"] .bw-spine {
+  color: rgba(46, 42, 34, .85);
+  background:
+    radial-gradient(150% 80% at calc(var(--lx) * 100%) -10%,
+      rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 58%),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, .5),
+      rgba(0, 0, 0, 0) 34%,
+      rgba(0, 0, 0, .16));
+  background-color: var(--spine);
+}
+.bw-spine-title {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  line-height: 1;
+  font-family: var(--spx-serif, serif);
+  max-height: 62%;
+  overflow: hidden;
+}
+.bw-spine-author {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 8.5px;
+  letter-spacing: .16em;
+  opacity: .68;
+}
+
+/* 纸页侧面（右侧）：米白 + 层叠页线 */
+.bw-pages {
+  top: 50%;
+  left: 100%;
+  width: var(--t);
+  height: calc(var(--h) - 2px);
+  margin-top: calc((var(--h) - 2px) / -2);
+  transform: rotateY(90deg) translateZ(calc(var(--t) / 2));
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(130, 118, 92, .30) 0 1px,
+      rgba(130, 118, 92, 0) 1px 3px),
+    linear-gradient(90deg, #eee7d3, #f8f3e3 46%, #e3d9bd);
+  border-radius: 0 2px 2px 0;
+}
+
+/* 书背（后侧）：封面同色系加深，旋转露出来时合理 */
+.bw-back {
+  inset: 0;
+  transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .28), rgba(0, 0, 0, .34)), var(--spine);
+}
+
+/* 纸页顶面（上侧） */
+.bw-top {
+  left: 0;
+  top: 0;
+  width: var(--w);
+  height: var(--t);
+  transform: rotateX(90deg) translateZ(calc(var(--t) / 2));
+  background:
+    repeating-linear-gradient(180deg,
+      rgba(130, 118, 92, .26) 0 1px,
+      rgba(130, 118, 92, 0) 1px 3px),
+    linear-gradient(180deg, #f2ecd9, #e7ddc2);
+}
+
+/* 书的投影（留在地面，不随书浮起）；水平偏移跟随光源方向反向移动 */
+.bw-shadow {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -13px;
+  height: 24px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(28, 32, 25, .42), rgba(28, 32, 25, 0) 70%);
+  transform:
+    translateZ(calc(var(--t) / -2 - 42px))
+    translateX(calc((var(--lx) - 0.5) * -22px))
+    scale(calc(var(--scale, 1) * var(--cs, 1)));
+  filter: blur(3px);
+  transition: opacity .55s ease, transform .55s cubic-bezier(.22, 1, .36, 1);
+  pointer-events: none;
+}
+.bw-book:hover .bw-shadow,
+.bw-book.active .bw-shadow {
+  opacity: .5;
+  transform:
+    translateZ(calc(var(--t) / -2 - 42px))
+    translateX(calc((var(--lx) - 0.5) * -22px))
+    scale(calc(var(--scale, 1) * var(--cs, 1) * 1.16));
+}
+
+/* ---------------- 分类胶囊 ---------------- */
+.bw-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+.bw-filter {
+  appearance: none;
+  border: 1px solid var(--spx-rule, #D9D4C4);
+  background: transparent;
+  color: var(--spx-ink-2, #4A4C43);
+  font-family: var(--spx-serif, serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .25s, border-color .25s, background-color .25s;
+}
+.bw-filter:hover {
+  border-color: var(--spx-ink, #1B1C18);
+  color: var(--spx-ink, #1B1C18);
+}
+.bw-filter.on {
+  background: var(--spx-ink, #1B1C18);
+  border-color: var(--spx-ink, #1B1C18);
+  color: #FCFBF6;
+}
+.bw-filter .bw-count {
+  opacity: .55;
+  font-size: 11px;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+/* ---------------- 跑马灯轨道（桌面端无限无缝滚动） ----------------
+   单条轨道承载全部副本做匀速平移：--loop = 单副本实测宽度，--dur = 副本宽
+   ÷ 速度（JS 按书籍实际数量与宽度计算写入）。所有层叠参数（弧高/缩放/明暗/
+   叠压）按副本周期取值，循环复位时下一副本与原位置像素级一致——无缝、
+   无空白、无跳变。悬停书架即暂停（play-state 恢复从原位置续跑，无跳帧）。
+   轨道必须 preserve-3d 承接 .bw → .bw-scroll → .bw-shelf 的透视链。 */
+.bw-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+@keyframes bw-marquee {
+  to { transform: translateX(var(--loop, -1400px)); }
+}
+.bw-shelf.marquee .bw-track {
+  animation: bw-marquee var(--dur, 32s) linear infinite;
+}
+.bw-shelf.marquee:hover .bw-track,
+.bw-shelf.marquee.paused .bw-track {
+  animation-play-state: paused;
+}
+/* Hero 两侧渐隐（infinite-marquee 的 smoothEdges 语义）：
+   渐变带覆盖在 3D 场景之上且不拦截指针（pointer-events:none），
+   避免 mask 直接裁在 .bw 上导致渐隐区内书籍丢失悬停命中。 */
+.bw.marquee::before,
+.bw.marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(48px, 7vw, 110px);
+  z-index: 70;                            /* 高于悬停书 z-index 60，淡出带始终柔和压边 */
+  pointer-events: none;
+}
+.bw.marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--bg, #F7F5EF), rgba(247, 245, 239, 0));
+}
+.bw.marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--bg, #F7F5EF), rgba(247, 245, 239, 0));
+}
+
+/* 悬停提示浮签（书名 · 作者） */
+.bw-tip {
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  transform: translate(-50%, -100%) scale(.94);
+  padding: 7px 12px 8px;
+  background: rgba(27, 28, 24, .94);
+  color: #FCFBF6;
+  font-family: var(--spx-serif, serif);
+  font-size: 12.5px;
+  letter-spacing: .06em;
+  white-space: nowrap;
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 80;
+}
+.bw-tip b { font-weight: 700; }
+.bw-tip i { font-style: normal; opacity: .6; margin-left: 6px; font-size: 11px; }
+.bw-book:hover .bw-tip,
+.bw-book:focus-visible .bw-tip,
+.bw-book.active .bw-tip {
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+}
+
+/* 入场：书从地面轻轻浮起 */
+@keyframes bw-rise {
+  from { opacity: 0; transform: translateX(var(--x)) translateY(calc(var(--ty, 0px) + var(--lift, 0px) + 34px)) translateZ(calc(var(--arc-z, 0px) + var(--z, 0px))) rotateY(var(--ry, 0deg)); }
+  to   { opacity: 1; transform: translateX(var(--x)) translateY(calc(var(--ty, 0px) + var(--lift, 0px))) translateZ(calc(var(--arc-z, 0px) + var(--z, 0px))) rotateY(var(--ry, 0deg)); }
+}
+.bw-book.enter {
+  animation: bw-rise .7s cubic-bezier(.22, 1, .36, 1) both;
+  animation-delay: var(--dly, 0ms);
+}
+
+/* 筛选隐藏 */
+.bw-book.hide {
+  display: none;
+}
+
+/* ---------------- 桌面场景：整体透视 + 指针视差 ----------------
+   透视交给外层 .bw；书架整体仅轻微俯视（-10°），书保持竖直站立，
+   封面可辨认，同时可见书脊、纸页侧面与少量顶面。
+   --srx/--sry 由指针视差叠加在基准倾角之上。
+   .bw-scroll 仅作窄屏滚动容器，桌面需保持 preserve-3d 透视链穿透。
+   ≤900px 的窄屏保留 .bw-shelf 自身 perspective 与横向滚动（见下方响应式）。 */
+@media (min-width: 901px) {
+  .bw {
+    perspective: 1800px;
+    perspective-origin: 50% 48%;
+  }
+  .bw-scroll,
+  .bw-shelf {
+    perspective: none;
+    transform-style: preserve-3d;
+  }
+  .bw-shelf {
+    transform: rotateX(calc(-10deg + var(--srx, 0deg))) rotateY(var(--sry, 0deg));
+    transform-origin: 50% 78%;
+    will-change: transform;
+  }
+  /* 悬停浮签随场景轻微俯仰，反向旋转回正对读者（先抵消场景俯仰，再抵消书本偏航） */
+  .bw-tip {
+    transform: translate(-50%, -100%) rotateX(10deg) rotateY(calc(var(--ry, 0deg) * -1)) scale(.94);
+    transform-origin: 50% 100%;
+  }
+  .bw-book:hover .bw-tip,
+  .bw-book:focus-visible .bw-tip,
+  .bw-book.active .bw-tip {
+    transform: translate(-50%, -100%) rotateX(10deg) rotateY(calc(var(--ry, 0deg) * -1)) scale(1);
+  }
+}
+
+/* ---------------- 响应式 ---------------- */
+@media (max-width: 1080px) {
+  .bw-shelf { height: 300px; }
+  .bw-book { --scale: .88; }
+}
+
+@media (max-width: 900px) {
+  .bw-book { --scale: .78; }
+  .bw-shelf {
+    height: 270px;
+    perspective: 1500px;
+    perspective-origin: 50% 40%;
+    /* 窄屏同款轻微俯视（-8°）；transform 仅在此断点注入 */
+    transform: rotateX(-8deg);
+    transform-origin: 50% 82%;
+  }
+  /* 窄屏滚动容器：只包裹书架，胶囊锚定书墙下方不随滚动。
+     桌面端不使用 overflow 方案，hover 突出与 3D 视差依赖可见溢出。 */
+  .bw-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 6px;
+  }
+  .bw-scroll::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 640px) {
+  .bw-book { --scale: .66; }
+  .bw-shelf { height: 230px; }
+  .bw-filter { font-size: 12px; padding: 7px 13px; }
+  .bw-tip { display: none; }
+}
+
+/* ---------------- 减少动态 ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bw-book, .bw-inner, .bw-shadow, .bw-filter { transition: none; }
+  .bw-book.enter { animation: none; }
+  .bw-shelf.marquee .bw-track { animation: none; }
+  .bw.marquee::before, .bw.marquee::after { display: none; }
+  .bw-book:hover .bw-front::before,
+  .bw-book:focus-visible .bw-front::before,
+  .bw-book.active .bw-front::before { animation: none; }
+  .bw-shelf { transform: none; }
+  .bw-book:hover, .bw-book:focus-visible, .bw-book.active {
+    transform: translateX(var(--x)) translateY(calc(var(--ty, 0px) + var(--lift, 0px))) translateZ(calc(var(--arc-z, 0px) + var(--z, 0px) + 20px)) rotateY(var(--ry, 0deg));
+  }
+}

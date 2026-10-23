@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUMEN BOOKS · 让每一本旧书，遇见下一位读者</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- 思源宋体（Noto Serif SC）标题字形本地化：6 个 woff2 共约 6KB，先加载，标题必用思源宋体 -->
+<link rel="stylesheet" href="fonts/noto-serif-sc.css">
+<!-- 其余字形/字重的思源宋体仍由 Google Fonts 按需子集兜底 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="nav-ball.css">
+<link rel="stylesheet" href="theme-mist.css">
+<style>
+  /* ======================================================================
+     Hero 重写：标题居中主视觉 + 书籍底部扇形 + 拟态玻璃
+     仅本页生效；覆盖 common.css / theme-mist.css 同名规则，不改原文件。
+     ====================================================================== */
+
+  /* 书籍风格艺术字体（宋体系衬线，标题专用），缺失时依次回退到系统宋体 */
+  :root{
+    --font-book:'Noto Serif SC','Source Han Serif SC','Songti SC','STSong','SimSun',serif;
+  }
+
+  /* 一、背景层：取消彩色光晕，只保留页顶一层极浅的暖白柔光 */
+  .bg-glow{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-attachment:fixed;
+    background:radial-gradient(120% 62% at 50% -12%, rgba(255,255,255,.85), rgba(255,255,255,0) 62%);
+    animation:glowDrift 40s ease-in-out infinite alternate;
+  }
+  @keyframes glowDrift{
+    0%  {background-position:0 0, 0 0, 0 0;}
+    100%{background-position:8px 6px, -6px -8px, -4px -8px;}
+  }
+  @media (prefers-reduced-motion: reduce){ .bg-glow{animation:none;} }
+
+  /* 二、Hero 布局：卡片纵向，标题居中在上，书贴底在下 */
+  .hero{ padding-top:48px; }
+
+  /* 四、纸面卡片：纯白纸面 + 浅米灰描边 + 轻阴影（去掉玻璃模糊） */
+  .hero-card{
+    display:flex; flex-direction:column;
+    min-height:78vh;
+    padding:56px 56px;
+    overflow:hidden;
+    border-radius:var(--radius);
+    background:var(--color-surface);
+    border:1px solid var(--color-border);
+    box-shadow:var(--shadow-card);
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  /* 覆盖 common.css 的 grid 分栏，并把 z-index 交还父级，
+     这样粒子画布才能落在「标题之上、书籍之下」 */
+  .hero-inner{
+    z-index:auto;
+    display:flex; flex-direction:row;
+    align-items:center; justify-content:space-between;
+    gap:clamp(24px,4vw,72px);
+    flex:1; min-height:0; width:100%;
+  }
+  .hero-copy{ position:relative; z-index:1; text-align:left; margin:0; max-width:560px; flex:1 1 auto; }
+
+  /* ============================================================
+     Hero 书籍：3D 书墙（组件样式见 bookwall.css，数据见 bookwall.js）
+     书墙已移出纸张卡片的限宽容器，此处只定义通栏出血节奏。
+     ============================================================ */
+  /* 通栏出血：书墙作为 .hero 的直接子级，宽 100%；
+     正的上外边距让书列整体位于纸面卡片下方，避免遮挡标题文字。
+     纸张卡片 overflow:hidden 只裁切自身子级，不会裁切已经移出的书墙；
+     hover 向前突出（translateZ）也不受任何父级 overflow 限制。 */
+  .bw-bleed{
+    position:relative;
+    z-index:4;
+    width:100%;
+    margin-top:clamp(24px, 3vw, 48px);
+    padding-bottom:10px;
+  }
+  @media (max-width:1099px){
+    .bw-bleed{ margin-top:clamp(20px, 3.5vw, 32px); }
+  }
+
+  /* 眉题：小字距大写 + 次级灰（绿色短横线来自 common.css 的 .eyebrow::before） */
+  .eyebrow{
+    display:flex; justify-content:flex-start; align-items:center; gap:10px;
+    letter-spacing:.18em; font-size:12px; font-weight:800;
+    color:var(--color-text-secondary);
+    margin:0 0 24px;
+  }
+  /* 主标题：墨黑正文，仅「读者」用品牌绿强调（逐字入场/粒子动效保持不变） */
+  .hero-title{
+    margin:0; text-align:left;
+    font-family:var(--font-book);
+    font-size:clamp(40px,4.4vw,70px);
+    font-weight:900; line-height:1.18; letter-spacing:.01em;
+    color:var(--color-text-primary);
+  }
+  .hero-title em{ font-style:normal; color:var(--color-primary); }
+  .hero-title .accent-dot{ display:none; }
+
+  /* 标题文字逐字入场效果（SplitText for hero-title，原生实现）
+     初始每个字符下沉/透明 + 轻微旋转，滚动进入视口后按序上浮归位 */
+  .split-wrap{ display:block; }
+  .split-wrap .split-char{
+    display:inline-block;
+    opacity:0;
+    transform:translateY(.6em) rotate(5deg);
+    will-change:transform, opacity;
+    white-space:pre;
+  }
+  .split-wrap.revealed .split-char{
+    opacity:1;
+    transform:none;
+    transition:transform .7s cubic-bezier(.22,1,.36,1), opacity .7s ease;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .split-wrap .split-char{ opacity:1; transform:none; transition:none; }
+  }
+
+  /* 六、粒子画布：z-index 在标题(1)之上、书籍(3)之下 */
+  .title-particles{ z-index:2; }
+
+  /* 窄屏微调：卡片收窄 */
+  @media (max-width:768px){
+    .hero-card{ min-height:auto; padding:48px 22px 32px; }
+  }
+  /* 断点由 1023px 提高到 1099px：给放大的标题留足行宽，避免与卡片同行时挤压换行 */
+  @media (max-width:1099px){
+    /* 窄屏改回上下布局：标题在上居中、卡片在下 */
+    .hero-inner{ flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+    .hero-copy{ text-align:center; max-width:none; }
+    .eyebrow{ justify-content:center; }
+    .hero-title{ text-align:center; font-size:clamp(40px,7.2vw,80px); }
+  }
+</style>
+<!-- 方案 B · 一页之间：出版物皮肤层（最后加载，覆盖以上所有样式） -->
+<link rel="stylesheet" href="spread.css">
+<!-- 首页 3D 书墙（最后加载，确保覆盖） -->
+<link rel="stylesheet" href="bookwall.css">
+  <link rel="stylesheet" href="pt.css">
+  <script>(function(){try{var f=JSON.parse(sessionStorage.getItem("lumen_pt")||"null");if(f&&Date.now()-f.t<30000){document.documentElement.classList.add("pt-pending");setTimeout(function(){document.documentElement.classList.remove("pt-pending")},3000);}}catch(e){}})();</script>
+</head>
+<body>
+<div id="pt-panel" aria-hidden="true"></div>
+
+<!-- ==================== 背景光晕层 ==================== -->
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- ==================== Hero ==================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-card surface">
+      <div class="hero-inner">
+
+        <div class="hero-copy">
+          <p class="eyebrow">Second-hand Books</p>
+
+          <h1 class="hero-title">
+            让每一本旧书<br>
+            遇见下一位<em>读者</em>
+          </h1>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D 书墙：通栏出血，位于纸张卡片（限宽容器）之外、Hero 区域之内，
+       横向铺满整个视口；组件样式 bookwall.css，数据与交互 bookwall.js -->
+  <div class="bw-bleed">
+    <div class="bw">
+      <!-- 窄屏滚动容器只包裹书架，胶囊始终锚定书墙下方不随滚动 -->
+      <div class="bw-scroll">
+        <div class="bw-shelf" id="bwShelf"></div>
+      </div>
+      <div class="bw-filters" id="bwFilters"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Footer ==================== -->
+<div class="site-footer-wrap">
+  <footer class="site-footer container footer-minimal">
+    <div class="footer-bottom">
+      <span>© 2026 LUMEN BOOKS · 仅用于学习交流</span>
+      <span>Reading makes us meet.</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ---------- 标题粒子发散效果（保留但减量） ---------- */
+(function () {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+
+  const card = document.querySelector('.hero-card');
+  const title = document.querySelector('.hero-title');
+  if (!card || !title) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'title-particles';
+  card.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  let W = 0, H = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = card.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const css = getComputedStyle(document.documentElement);
+  // 粒子改用品牌绿的深浅两层，在暖纸白底上清晰可见
+  const accent = '#A8C3AE';
+  const accentSoft = '#356B4A';
+
+  const particles = [];
+
+  // 标题中心（相对卡片）——居中后自然从标题中心向四周散开
+  function titleCenter() {
+    const tr = title.getBoundingClientRect();
+    const cr = card.getBoundingClientRect();
+    return {
+      x: tr.left - cr.left + tr.width / 2,
+      y: tr.top - cr.top + tr.height / 2,
+      w: tr.width
+    };
+  }
+
+  // 一次性爆发：粒子从标题向四周发散（数量减半 54 → 24）
+  function burst() {
+    const c = titleCenter();
+    const n = 24;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.4 + Math.random() * 4.6;
+      particles.push({
+        x: c.x, y: c.y,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp - 0.5,
+        life: 1, decay: 0.007 + Math.random() * 0.011,
+        r: 1 + Math.random() * 2.8,
+        color: Math.random() < 0.55 ? accent : accentSoft
+      });
+    }
+  }
+
+  // 持续飘散的微弱粒子（上限减半 16 → 8）
+  function ambient() {
+    const c = titleCenter();
+    particles.push({
+      x: c.x + (Math.random() - 0.5) * c.w * 0.95,
+      y: c.y + (Math.random() - 0.5) * 44,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: -0.3 - Math.random() * 0.55,
+      life: 1, decay: 0.004 + Math.random() * 0.004,
+      r: 0.8 + Math.random() * 1.7,
+      color: accent
+    });
+  }
+
+  let frame = 0;
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    if (frame % 16 === 0) {
+      const drifting = particles.filter(p => p.vy < 0 && p.decay < 0.01).length;
+      if (drifting < 8) ambient();
+    }
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.985; p.vy *= 0.985;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 9;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    frame++;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // 标题入场动画启动后触发爆发
+  setTimeout(burst, 380);
+
+  /* 切到后台标签页时暂停动画，避免看不见还在空转耗电 */
+  let rafId = null;
+  function start() { rafId = requestAnimationFrame(tick); }
+  function stop() { if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stop(); else start();
+  });
+  start();
+})();
+</script>
+
+<script>
+/* ============================================================
+   标题文字逐字效果（port 参考 SplitText 的字符级入场）
+   将 .hero-title 拆成字符 span，滚动进入视口时按序上浮归位。
+   保留 <em>强调色与 <br> 换行；尊重 prefers-reduced-motion。
+   ============================================================ */
+(function () {
+  var title = document.querySelector('.hero-title');
+  if (!title) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 递归把文本节点逐字包进 span.split-char（空格保留为纯文本，避免挤压断词） */
+  function splitChars(container) {
+    var nodes = Array.prototype.slice.call(container.childNodes);
+    nodes.forEach(function (child) {
+      if (child.nodeType === 3) {
+        var text = child.textContent;
+        if (!text) return;
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < text.length; i++) {
+          var ch = text[i];
+          if (ch === ' ') {
+            frag.appendChild(document.createTextNode(' '));
+          } else {
+            var s = document.createElement('span');
+            s.className = 'split-char';
+            s.textContent = ch;
+            frag.appendChild(s);
+          }
+        }
+        child.replaceWith(frag);
+      } else if (child.nodeType === 1 && child.tagName !== 'BR') {
+        splitChars(child);
+      }
+    });
+  }
+
+  function reveal(delay) {
+    if (title.classList.contains('revealed')) return;
+    title.classList.add('revealed');
+    var chars = title.querySelectorAll('.split-char');
+    chars.forEach(function (c, i) {
+      if (reduce) return;
+      c.style.transitionDelay = (i * 42) + 'ms';
+    });
+  }
+
+  title.classList.add('split-wrap');
+  splitChars(title);
+
+  if (reduce) { reveal(0); }
+  else if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[entries.length - 1].isIntersecting) {
+        io.disconnect();
+        reveal(0);
+      }
+    }, { threshold: 0.25 });
+    io.observe(title);
+    /* 兜底：无论是否进入视口，尽快触发入场 */
+    setTimeout(reveal, 900);
+  } else {
+    reveal(0);
+  }
+})();
+</script>
+
+<script src="auth.js"></script>
+<script src="nav-ball.js" defer></script>
+<script src="store.js"></script>
+<!-- 首页 3D 书墙 -->
+<script src="bookwall.js" defer></script>
+<!-- 方案 B · 一页之间：书签绸带 + 跨页刊头 -->
+<script src="spread.js"></script>  <script src="pt.js" defer></script>
+</body>
+</html>

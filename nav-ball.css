@@ -1,0 +1,113 @@
+/* ==========================================================================
+   NAV BALL · 共享小球导航组件
+   --------------------------------------------------------------------------
+   由 nav-ball.js 自动注入 DOM，本文件只负责样式。
+   颜色 / 圆角 / 阴影优先复用 theme-mist.css 的 token；取不到时在此兜底。
+   ========================================================================== */
+/* 兜底：正常情况由 common.css / theme-mist.css 提供，这里仅防止单独引用本文件 */
+:root{
+  --accent:var(--color-primary,#356B4A);
+  --accent-light:#B9CFBE;
+  --bg:var(--color-background,#F7F5EF);
+}
+
+/* 固定锚点：触发球左上角，始终覆盖在最上层 */
+.nb-root{
+  position:fixed;
+  left:24px;top:24px;
+  z-index:9999;
+}
+
+/* ---------------- 触发球 ---------------- */
+.nb-trigger{
+  position:relative;
+  width:52px;height:52px;
+  padding:0;border:0;cursor:pointer;
+  border-radius:50%;
+  background:var(--accent);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  box-shadow:0 10px 26px -12px rgba(35,72,50,.50);
+  transition:transform .25s ease;
+}
+.nb-trigger:hover{transform:scale(1.06);}
+.nb-trigger .nb-line{
+  display:block;height:2px;border-radius:2px;background:#fff;
+  transition:transform .3s cubic-bezier(.2,.8,.3,1),opacity .25s,width .3s;
+}
+.nb-trigger .nb-line:nth-child(1){width:20px;}
+.nb-trigger .nb-line:nth-child(2){width:14px;}
+.nb-trigger .nb-line:nth-child(3){width:8px;}
+
+/* 展开态：三条线向中心收拢并旋转成小叉 */
+.nb-trigger.open .nb-line:nth-child(1){width:20px;transform:translateY(7px) rotate(45deg);}
+.nb-trigger.open .nb-line:nth-child(3){width:20px;transform:translateY(-7px) rotate(-45deg);}
+.nb-trigger.open .nb-line:nth-child(2){opacity:0;transform:scaleX(0);}
+
+/* 菜单提示文字（默认隐藏，首次访问由 JS 点亮） */
+.nb-hint{
+  position:absolute;left:62px;top:50%;transform:translateY(-50%);
+  font-size:10px;line-height:1;color:var(--color-text-secondary,#777A72);white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .4s ease;
+}
+.nb-hint.show{opacity:1;}
+.nb-hint.hide{opacity:0;}
+
+/* 首访脉冲 */
+@keyframes nb-pulse{0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);}}
+.nb-pulse{animation:nb-pulse .5s ease;}
+
+/* ---------------- 小球容器与小球 ---------------- */
+.nb-balls{
+  position:absolute;left:26px;top:26px;       /* = 触发球圆心相对 .nb-root */
+  width:0;height:0;pointer-events:none;
+}
+.nb-ball{
+  position:absolute;left:0;top:0;
+  width:64px;height:64px;margin:-32px 0 0 -32px;
+  border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  text-decoration:none;color:#fff;text-align:center;
+  font-size:12px;line-height:1.15;
+  transform:translate(0,0) scale(0);opacity:0;
+  box-shadow:0 12px 26px -12px rgba(35,72,50,.45);
+  will-change:transform,opacity;
+  pointer-events:none;            /* 收起态不可点 */
+}
+.nb-ball svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.8;display:block;}
+.nb-ball-label{font-size:12px;max-width:60px;font-weight:600;}
+
+/* 四个小球：同一森林绿的四个深浅层次，保证白字对比度一致 */
+.nb-ball:nth-child(1){background:#356B4A;}
+.nb-ball:nth-child(2){background:#2F6042;}
+.nb-ball:nth-child(3){background:#29543A;}
+.nb-ball:nth-child(4){background:#234832;}
+
+/* 展开态：小球可点击 */
+.nb-root.open .nb-ball{pointer-events:auto;}
+
+/* 当前页小球：弱化且不可点击 */
+.nb-ball.active{opacity:.35 !important;cursor:default;pointer-events:none;}
+.nb-root.open .nb-ball.active{pointer-events:none;}
+
+/* ---------------- 圆形扩散转场 ---------------- */
+.nb-transition{
+  position:fixed;width:0;height:0;border-radius:50%;
+  background:var(--bg);
+  z-index:9998;pointer-events:none;visibility:hidden;
+  will-change:transform;
+}
+
+/* ---------------- 响应式：移动端 ---------------- */
+@media (max-width:768px){
+  .nb-root{left:18px;top:18px;}
+  .nb-trigger{width:46px;height:46px;}
+  .nb-hint{left:56px;}
+  .nb-balls{left:23px;top:23px;}
+  .nb-ball{width:56px;height:56px;margin:-28px 0 0 -28px;font-size:11px;}
+  .nb-ball svg{width:14px;height:14px;}
+}
+
+/* ---------------- 减少动态效果 ---------------- */
+@media (prefers-reduced-motion:reduce){
+  .nb-trigger,.nb-trigger .nb-line,.nb-hint{transition:none;}
+}

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>卖书 · LUMEN BOOKS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="common.css">
+<style>
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:32px;margin-bottom:36px;
+}
+.section-head h2{
+  font-size:clamp(26px,3vw,38px);font-weight:800;line-height:1.15;
+  margin:0 0 10px;letter-spacing:-0.02em;color:var(--text);
+}
+.section-desc{color:var(--text-dim);max-width:600px;margin:0;font-size:15px;line-height:1.7;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--text);color:#fff;
+  padding:14px 28px;border-radius:999px;
+  font-size:14px;font-weight:600;letter-spacing:.01em;
+  transition:.25s;white-space:nowrap;border:1.5px solid var(--text);
+}
+.btn-primary:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-2px);}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;background:var(--text);border-color:var(--text);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1.5px solid var(--line);color:var(--text);
+  background:var(--glass-strong);font-size:14px;font-weight:600;
+  padding:14px 28px;border-radius:999px;transition:.25s;
+}
+.icon-btn{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line);background:var(--glass-strong);
+  display:grid;place-items:center;transition:.25s;
+}
+/* ============================================================
+   Page head
+   ============================================================ */
+.page-head{padding:16px 0 8px;}
+.page-head-inner{padding:40px 44px;display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center;}
+.breadcrumb{
+  font-size:12.5px;color:var(--text-faint);
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+}
+.breadcrumb a{transition:.25s;}
+.breadcrumb a:hover{color:var(--accent);}
+.breadcrumb .sep{opacity:.5;}
+.page-title{
+  font-size:clamp(28px,3.4vw,44px);font-weight:800;
+  margin:0 0 12px;letter-spacing:-0.02em;color:var(--text);line-height:1.1;
+}
+.page-sub{color:var(--text-dim);margin:0;font-size:15px;max-width:620px;line-height:1.75;}
+.page-sub b{color:var(--text);font-weight:600;}
+/* 流程图（头部右侧） */
+.flow-mini{
+  display:flex;flex-direction:column;gap:10px;min-width:220px;
+}
+.flow-mini .step{
+  display:flex;align-items:center;gap:12px;
+  font-size:13px;color:var(--text-dim);
+  padding:12px 16px;border-radius:14px;background:var(--glass-soft);
+  border:1px solid var(--line);
+}
+.flow-mini .step b{
+  width:24px;height:24px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--text);color:#fff;font-size:12px;font-weight:800;
+}
+.flow-mini .step.active{background:var(--accent-bg);border-color:rgba(53,107,74,.40);color:var(--text);}
+.flow-mini .step.active b{background:var(--accent);}
+/* ============================================================
+   布局：左估价区 + 右回收清单
+   ============================================================ */
+.sell-layout{
+  display:grid;grid-template-columns:1.35fr 1fr;gap:24px;
+  padding:16px 0 32px;align-items:start;
+}
+/* 估价区 */
+.estimate-card{padding:36px 40px;}
+.estimate-card h3{
+  font-size:20px;font-weight:800;margin:0 0 6px;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:10px;
+}
+.estimate-card h3::before{
+  content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;
+}
+.estimate-card .sub{color:var(--text-dim);font-size:14px;margin:0 0 26px;}
+.isbn-row{
+  display:flex;gap:12px;margin-bottom:12px;
+}
+.isbn-input{
+  display:flex;align-items:center;gap:16px;flex:1;
+}
+/* From Uiverse.io by eslam-hany — 浮动标签描边输入框（配色对齐站点墨色） */
+.input-container{
+  position:relative;flex:1;min-width:0;
+}
+.input-container .input{
+  width:100%;box-sizing:border-box;
+  padding:10px;height:44px;
+  border:2px solid var(--text);
+  border-top:none;border-bottom:none;
+  font-size:15px;background:transparent;
+  color:var(--text);outline:none;
+  box-shadow:7px 7px 0px 0px var(--text);
+  transition:all .4s;
+}
+.input-container .input::placeholder{color:var(--text-faint);}
+.input-container .input:focus{
+  box-shadow:none;
+  transition:all .4s;
+}
+.input-container .label{
+  position:absolute;
+  top:10px;left:10px;
+  color:var(--text-dim);
+  font-size:13px;letter-spacing:.05em;
+  background:var(--surface,#fff);
+  padding:0 4px;
+  transition:all .4s;
+  transform:scale(0);
+  z-index:1;
+  pointer-events:none;
+}
+.input-container .topline{
+  position:absolute;
+  content:"";
+  background-color:var(--text);
+  width:0%;height:2px;
+  right:0;top:0;
+  transition:all .4s;
+}
+.input-container .input:focus ~ .topline{width:35%;transition:all .4s;}
+.input-container .underline{
+  position:absolute;
+  content:"";
+  background-color:var(--text);
+  width:0%;height:2px;
+  right:0;bottom:0;
+  transition:all .4s;
+}
+.input-container .input:focus ~ .underline{width:100%;transition:all .4s;}
+.input-container .input:focus ~ .label{
+  top:-9px;
+  transform:scale(1);
+  transition:all .4s;
+}
+.isbn-input button{
+  flex:none;border:0;background:var(--text);color:#fff;
+  font-weight:600;font-size:14px;
+  padding:13px 26px;border-radius:999px;transition:.25s;
+}
+.isbn-input button:hover{background:var(--accent);}
+.scan-btn{
+  flex:none;display:inline-flex;align-items:center;gap:8px;
+  background:var(--glass-strong);color:var(--text);border:1.5px solid var(--line);
+  padding:0 22px;border-radius:999px;font-size:14px;font-weight:600;
+  transition:.25s;
+}
+.scan-btn:hover{border-color:var(--text);background:var(--text);color:#fff;}
+.scan-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.hint{
+  font-size:12.5px;color:var(--text-faint);
+  display:flex;align-items:center;gap:6px;margin-bottom:26px;
+}
+.hint b{color:var(--text-dim);font-weight:600;}
+/* 当前书籍卡片 */
+.book-preview{
+  border:1.5px solid var(--line);border-radius:var(--radius-sm);
+  padding:24px;background:var(--glass-soft);transition:.35s;
+}
+.book-preview.empty{
+  border-style:dashed;text-align:center;padding:48px 24px;background:var(--glass-soft);
+}
+.book-preview.empty .ph-cover{
+  width:70px;aspect-ratio:3/4.2;border-radius:5px;margin:0 auto 18px;
+  background:repeating-linear-gradient(45deg,#eaeaea 0 8px,#f6f6f6 8px 16px);
+  border:1px dashed var(--line-mid);
+}
+.book-preview.empty h4{
+  font-size:15px;font-weight:700;margin:0 0 6px;color:var(--text);
+}
+.book-preview.empty p{
+  font-size:13px;color:var(--text-faint);margin:0;line-height:1.7;
+}
+.preview-inner{display:grid;grid-template-columns:78px 1fr;gap:20px;align-items:flex-start;}
+.preview-cover{
+  width:78px;aspect-ratio:3/4.2;border-radius:5px;flex:none;
+  background:var(--book-bg,#111);
+  box-shadow:0 12px 24px -14px rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.18);
+  position:relative;overflow:hidden;
+}
+.preview-cover::before{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:6px;
+  background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(0,0,0,.25));
+}
+.preview-meta h4{
+  font-size:17px;font-weight:800;margin:0 0 5px;line-height:1.35;letter-spacing:-0.01em;
+}
+.preview-meta .author{font-size:13.5px;color:var(--text-dim);margin:0 0 2px;}
+.preview-meta .pub{font-size:12.5px;color:var(--text-faint);margin:0 0 14px;}
+.preview-meta .isbn-tag{
+  display:inline-block;font-size:11.5px;color:var(--text-faint);
+  padding:3px 9px;border-radius:7px;background:var(--glass-chip);
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;
+}
+/* 品相选择 */
+.cond-section{margin-top:24px;padding-top:22px;border-top:1px solid var(--line);}
+.cond-section h5{
+  font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text);margin:0 0 14px;
+}
+.cond-options{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.cond-option{
+  display:flex;flex-direction:column;gap:3px;
+  padding:12px 14px;border-radius:14px;
+  border:1.5px solid var(--line);background:var(--glass-strong);
+  cursor:pointer;transition:.25s;text-align:left;
+}
+.cond-option:hover{border-color:var(--line-mid);}
+.cond-option.selected{border-color:var(--accent);background:var(--accent-bg);}
+.cond-option .cond-name{font-size:13.5px;font-weight:700;color:var(--text);}
+.cond-option .cond-desc{font-size:11.5px;color:var(--text-faint);line-height:1.5;}
+/* 估价结果 */
+.estimate-result{
+  margin-top:24px;padding-top:22px;border-top:1px solid var(--line);
+  display:none;
+}
+.estimate-result.show{display:block;}
+.result-row{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  padding:18px 20px;border-radius:18px;background:var(--accent-bg);
+  border:1px solid rgba(53,107,74,.40);margin-bottom:18px;
+}
+.result-row .label{font-size:12.5px;color:var(--text-dim);margin-bottom:4px;letter-spacing:.02em;}
+.result-row .amount{
+  font-size:32px;font-weight:800;color:var(--accent);
+  letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;
+}
+.result-row .amount small{font-size:16px;font-weight:700;margin-right:2px;}
+.result-row .ref{
+  text-align:right;font-size:12px;color:var(--text-faint);line-height:1.6;
+}
+.result-row .ref b{color:var(--text-dim);font-weight:700;}
+.result-actions{display:flex;gap:10px;}
+.result-actions button{flex:1;}
+/* ============================================================
+   右侧回收清单
+   ============================================================ */
+.cart-card{padding:32px 32px 26px;position:sticky;top:100px;}
+.cart-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:18px;margin-bottom:6px;border-bottom:1px solid var(--line);
+}
+.cart-head h3{
+  font-size:20px;font-weight:800;margin:0;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:10px;
+}
+.cart-head h3::before{
+  content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;
+}
+.cart-head .count{
+  font-size:12.5px;color:var(--text-faint);
+  padding:4px 10px;border-radius:999px;background:var(--glass-chip);font-weight:700;
+}
+.cart-list{min-height:80px;}
+.cart-empty{
+  padding:44px 16px;text-align:center;
+  color:var(--text-faint);font-size:13.5px;line-height:1.7;
+}
+.cart-empty b{color:var(--text-dim);font-weight:600;}
+.cart-item{
+  display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;
+  padding:15px 0;border-bottom:1px solid var(--line);
+}
+.cart-item:last-child{border-bottom:0;}
+.cart-item .cover-sm{
+  width:44px;aspect-ratio:3/4.2;border-radius:4px;
+  background:var(--book-bg,#111);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 14px -10px rgba(0,0,0,.4);
+  position:relative;overflow:hidden;
+}
+.cart-item .cover-sm::before{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(0,0,0,.25));
+}
+.cart-item .info{min-width:0;}
+.cart-item .info h5{
+  font-size:13.5px;font-weight:700;margin:0 0 3px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.cart-item .info .meta{
+  font-size:11.5px;color:var(--text-faint);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.cart-item .info .cond-tag{
+  font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;
+  background:var(--glass-chip);color:var(--text-dim);
+}
+.cart-item .price{
+  font-size:15px;font-weight:800;color:var(--accent);
+  font-variant-numeric:tabular-nums;letter-spacing:-0.01em;
+}
+.cart-item .price small{font-size:11px;font-weight:700;margin-right:1px;}
+.cart-item .remove{
+  border:0;background:none;padding:4px;margin-left:6px;
+  color:var(--text-faint);font-size:16px;line-height:1;
+  transition:.25s;
+}
+.cart-item .remove:hover{color:var(--accent);}
+.cart-right{
+  display:flex;align-items:center;gap:8px;flex:none;
+}
+.cart-right .col{
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+}
+/* 合计 */
+.cart-total{
+  margin-top:6px;padding-top:20px;border-top:1px solid var(--line);
+}
+.total-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:8px;font-size:13px;color:var(--text-dim);
+}
+.total-row.big{
+  margin:14px 0 20px;padding-top:14px;border-top:1px dashed var(--line-mid);
+  font-size:14px;color:var(--text);
+}
+.total-row.big .num{
+  font-size:30px;font-weight:800;color:var(--accent);
+  letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;
+}
+.total-row.big .num small{font-size:16px;font-weight:700;margin-right:2px;}
+.cart-actions{display:flex;flex-direction:column;gap:10px;}
+.cart-actions button{width:100%;justify-content:center;}
+.cart-note{
+  font-size:12px;color:var(--text-faint);line-height:1.7;margin-top:14px;
+  padding-top:14px;border-top:1px solid var(--line);
+}
+.cart-note b{color:var(--text-dim);font-weight:600;}
+/* ============================================================
+   回收流程说明（复用首页 style）
+   ============================================================ */
+.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.step-card{
+  position:relative;background:var(--surface);
+  border-radius:var(--radius);padding:30px 28px 26px;
+  display:flex;flex-direction:column;
+  box-shadow:0 1px 0 rgba(255,255,255,.4) inset, 0 20px 50px -24px rgba(0,0,0,.1);
+  transition:transform .35s cubic-bezier(.2,.75,.3,1),box-shadow .35s;
+}
+.step-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.16);
+}
+.step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--accent-bg);color:var(--accent);
+  font-size:18px;font-weight:800;
+  margin-bottom:18px;position:relative;z-index:1;
+  border:1px solid var(--accent-light);
+}
+.step-card h3{
+  font-size:19px;font-weight:700;line-height:1.45;margin:0 0 10px;
+  letter-spacing:-0.01em;color:var(--text);transition:color .25s;
+}
+.step-card:hover h3{color:var(--accent);}
+.step-card p{
+  color:var(--text-dim);font-size:14px;margin:0 0 24px;flex:1;line-height:1.65;
+}
+.step-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:18px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--text-faint);
+}
+.step-foot .step-next{color:var(--accent);font-weight:700;}
+/* 规则 */
+.rules-card{padding:40px 44px;margin-top:24px;}
+.rules-card h3{
+  font-size:20px;font-weight:800;margin:0 0 22px;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:10px;
+}
+.rules-card h3::before{
+  content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;
+}
+.rules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px 40px;}
+.rule-item{display:flex;gap:14px;align-items:flex-start;}
+.rule-num{
+  width:28px;height:28px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--glass-chip);color:var(--text-dim);font-size:12px;font-weight:800;
+}
+.rule-item h5{font-size:14px;font-weight:700;margin:3px 0 4px;color:var(--text);}
+.rule-item p{font-size:13px;color:var(--text-dim);margin:0;line-height:1.7;}
+/* ============================================================
+   提交弹层
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.4);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(4px);
+}
+.overlay.show{display:flex;}
+.modal{
+  background:var(--surface);border-radius:var(--radius);
+  width:min(520px,100%);padding:40px 40px 32px;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.4);
+  max-height:90vh;overflow-y:auto;
+  animation:pop .35s cubic-bezier(.2,.75,.3,1);
+}
+@keyframes pop{
+  from{opacity:0;transform:translateY(20px) scale(.97);}
+  to{opacity:1;transform:none;}
+}
+.modal h3{
+  font-size:22px;font-weight:800;margin:0 0 8px;letter-spacing:-0.01em;
+}
+.modal .sub{font-size:14px;color:var(--text-dim);margin:0 0 24px;line-height:1.7;}
+.modal .sub b{color:var(--text);font-weight:700;}
+.modal-fields{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;}
+.field label{
+  display:block;font-size:12px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text);margin-bottom:8px;
+}
+.field input,.field select{
+  width:100%;padding:13px 16px;border-radius:14px;
+  border:1.5px solid var(--line);background:var(--glass-soft);
+  font-size:14.5px;color:var(--text);outline:none;transition:.25s;
+}
+.field input:focus,.field select:focus{border-color:var(--accent);background:var(--glass-strong);}
+.field .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ship-options{display:flex;flex-direction:column;gap:10px;}
+.ship-option{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;
+  border:1.5px solid var(--line);border-radius:16px;background:var(--glass-strong);
+  cursor:pointer;transition:.25s;text-align:left;
+}
+.ship-option:hover{border-color:var(--line-mid);}
+.ship-option.selected{border-color:var(--accent);background:var(--accent-bg);}
+.ship-option .ship-icon{
+  width:36px;height:36px;border-radius:12px;flex:none;
+  display:grid;place-items:center;
+  background:var(--glass-chip);color:var(--text-dim);
+}
+.ship-option.selected .ship-icon{background:var(--accent);color:#fff;}
+.ship-option .ship-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.ship-option .ship-text{flex:1;}
+.ship-option .ship-text b{display:block;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ship-option .ship-text span{font-size:12.5px;color:var(--text-faint);}
+.modal-actions{display:flex;gap:10px;}
+.modal-actions button{flex:1;justify-content:center;}
+/* 成功态 */
+.success{
+  text-align:center;padding:16px 8px 8px;
+}
+.success-icon{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 20px;
+  background:var(--accent-bg);border:1px solid rgba(53,107,74,.40);
+  display:grid;place-items:center;
+}
+.success-icon svg{width:28px;height:28px;stroke:var(--accent);fill:none;stroke-width:2.5;}
+.success h3{margin-bottom:10px;}
+.success .sub{margin-bottom:22px;}
+.success .order-no{
+  font-size:13px;color:var(--text-dim);
+  padding:12px 16px;border-radius:14px;background:var(--glass-soft);
+  border:1px solid var(--line);margin-bottom:24px;
+  font-variant-numeric:tabular-nums;
+}
+.success .order-no b{color:var(--text);font-weight:700;}
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(20px);
+  background:var(--text);color:#fff;
+  font-size:13.5px;font-weight:600;
+  padding:13px 24px;border-radius:999px;
+  box-shadow:0 20px 40px -16px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:.35s;z-index:300;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* Footer */
+.site-footer-wrap{padding-bottom:32px;padding-top:32px;}
+.footer-brand p{max-width:320px;line-height:1.75;color:var(--text-faint);margin:0;}
+.footer-bottom span:last-child{font-weight:600;letter-spacing:.08em;}
+/* Responsive */
+@media (max-width:1080px){
+  .sell-layout{grid-template-columns:1fr;}
+  .cart-card{position:relative;top:0;}
+  .page-head-inner{grid-template-columns:1fr;}
+  .flow-mini{flex-direction:row;flex-wrap:wrap;min-width:0;}
+  .step-grid{grid-template-columns:1fr;}
+  .rules-grid{grid-template-columns:1fr;}
+}
+@media (max-width:900px){
+  .nav{display:none;}
+  .footer-inner{grid-template-columns:1fr;gap:42px;}
+  .site-footer{padding:48px 32px 0;}
+}
+@media (max-width:640px){
+  .container{width:calc(100% - 32px);}
+  .header-inner{padding:0 18px;}
+  .page-head-inner{padding:28px 22px;}
+  .estimate-card{padding:28px 22px;}
+  .cart-card{padding:26px 22px 22px;}
+  .rules-card{padding:28px 22px;}
+  .isbn-row{flex-direction:column;}
+  .scan-btn{padding:13px 22px;justify-content:center;}
+  .cond-options{grid-template-columns:1fr;}
+  .modal{padding:30px 24px 24px;}
+  .footer-cols{grid-template-columns:1fr 1fr;}
+}
+</style>
+<link rel="stylesheet" href="nav-ball.css">
+<link rel="stylesheet" href="theme-mist.css">
+<!-- 方案 B · 一页之间：出版物皮肤层（最后加载，覆盖以上所有样式） -->
+<link rel="stylesheet" href="spread.css">
+  <link rel="stylesheet" href="pt.css">
+  <script>(function(){try{var f=JSON.parse(sessionStorage.getItem("lumen_pt")||"null");if(f&&Date.now()-f.t<30000){document.documentElement.classList.add("pt-pending");setTimeout(function(){document.documentElement.classList.remove("pt-pending")},3000);}}catch(e){}})();</script>
+</head>
+<body>
+<div id="pt-panel" aria-hidden="true"></div>
+
+
+<!-- ==================== Page Head ==================== -->
+<section class="page-head">
+  <div class="container">
+    <div class="surface page-head-inner">
+
+      <div>
+        <div class="breadcrumb">
+          <a href="index.html">首页</a>
+          <span class="sep">/</span>
+          <span>卖书</span>
+        </div>
+
+        <h1 class="page-title">卖书</h1>
+        <p class="page-sub">
+          扫码估价，一次寄出。品相合格 <b>24 小时打款</b>。
+        </p>
+      </div>
+
+      <div class="flow-mini">
+        <div class="step active"><b>1</b> 扫码估价</div>
+        <div class="step"><b>2</b> 一次寄出</div>
+        <div class="step"><b>3</b> 验收打款</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 布局：左估价 + 右清单 ==================== -->
+<section class="container">
+  <div class="sell-layout">
+
+    <!-- 左：估价区 -->
+    <div class="surface estimate-card">
+      <h3>扫码估价</h3>
+      <p class="sub">输入 ISBN 或扫描书背条形码，自动填充书名、作者、出版社。一次估一本，也可以连续扫多本。</p>
+
+      <div class="isbn-row">
+        <form class="isbn-input" id="isbnForm" onsubmit="return false;">
+          <div class="input-container">
+            <input class="input" name="text" type="text" id="isbnInput" placeholder="输入 ISBN，如 9787508684031" autocomplete="off">
+            <label class="label" for="isbnInput">输入 ISBN</label>
+            <div class="topline"></div>
+            <div class="underline"></div>
+          </div>
+          <button type="submit">估价</button>
+        </form>
+        <button class="scan-btn" id="scanBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M3 12h18"/></svg>
+          扫码
+        </button>
+      </div>
+
+      <p class="hint">
+        <span>试试：</span>
+        <b>9787508684031</b> · <b>9787544270878</b> · <b>9787020024759</b>
+      </p>
+
+      <!-- 当前书籍预览 -->
+      <div class="book-preview empty" id="bookPreview">
+        <div class="ph-cover"></div>
+        <h4>还没有估价的书</h4>
+        <p>输入 ISBN 或扫码后，<br>这里会显示书籍信息与回收价。</p>
+      </div>
+
+      <!-- 品相选择 + 估价结果（仅在预览不为空时显示） -->
+      <div id="condWrap" style="display:none;">
+        <div class="cond-section">
+          <h5>选择品相</h5>
+          <div class="cond-options" id="condOptions">
+            <button class="cond-option selected" data-cond="new" data-rate="0.9">
+              <span class="cond-name">全新 / 未拆封</span>
+              <span class="cond-desc">塑封完好，无翻阅痕迹</span>
+            </button>
+            <button class="cond-option" data-cond="like-new" data-rate="0.75">
+              <span class="cond-name">九五新</span>
+              <span class="cond-desc">接近全新，无笔记无划线</span>
+            </button>
+            <button class="cond-option" data-cond="good" data-rate="0.6">
+              <span class="cond-name">九成新</span>
+              <span class="cond-desc">有轻微使用痕迹，无笔记</span>
+            </button>
+            <button class="cond-option" data-cond="used" data-rate="0.4">
+              <span class="cond-name">八成新及以下</span>
+              <span class="cond-desc">有划线/笔记，不影响阅读</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="estimate-result show" id="estimateResult">
+          <div class="result-row">
+            <div>
+              <div class="label">平台回收价</div>
+              <div class="amount" id="estAmount"><small>¥</small>0</div>
+            </div>
+            <div class="ref">
+              同类书市场价约 <b id="estMarket">¥0</b><br>
+              平台售价约为定价的 <b id="estRate">0%</b>
+            </div>
+          </div>
+          <div class="result-actions">
+            <button class="btn-ghost" type="button" id="clearBtn">清空重输</button>
+            <button class="btn-primary" type="button" id="addBtn">加入回收清单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：回收清单 -->
+    <aside class="surface cart-card">
+      <div class="cart-head">
+        <h3>回收清单</h3>
+        <span class="count" id="cartCount">0 本</span>
+      </div>
+
+      <div class="cart-list" id="cartList">
+        <div class="cart-empty" id="cartEmpty">
+          <b>清单还是空的。</b><br>
+          左侧扫码估价后，点击「加入回收清单」。
+        </div>
+      </div>
+
+      <div class="cart-total" id="cartTotal" style="display:none;">
+        <div class="total-row"><span>书籍数量</span><span id="totalCount">0 本</span></div>
+        <div class="total-row"><span>预估总价</span><span id="totalSub">¥0</span></div>
+        <div class="total-row big">
+          <span>合计回收</span>
+          <span class="num" id="totalAmount"><small>¥</small>0</span>
+        </div>
+        <div class="cart-actions">
+          <button class="btn-primary" type="button" id="submitBtn">提交回收订单</button>
+          <button class="btn-ghost" type="button" id="clearCartBtn">清空清单</button>
+        </div>
+        <p class="cart-note">
+          <b>免费上门取件</b> · 品相合格 24 小时内打款<br>
+          验收有出入按透明规则议价，不强行扣留。
+        </p>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ==================== 回收流程 ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="eyebrow">How It Works</p>
+        <h2>三步完成回收</h2>
+        <p class="section-desc">
+          点「扫码估价」之后会发生什么，每一步都写在这里。价格透明，不勉强寄出。
+        </p>
+      </div>
+      <a class="link-more" href="#rules">回收规则 →</a>
+    </div>
+
+    <div class="step-grid">
+      <article class="step-card reveal">
+        <span class="step-num">1</span>
+        <p class="step-kicker">Step 01</p>
+        <h3>扫码估价</h3>
+        <p>扫 ISBN 即时看回收价，多本可批量估价。价格透明看得见，不勉强寄出。</p>
+        <div class="step-foot">
+          <span>耗时约 30 秒</span>
+          <span class="step-next">下一步：寄出 →</span>
+        </div>
+      </article>
+
+      <article class="step-card reveal">
+        <span class="step-num">2</span>
+        <p class="step-kicker">Step 02</p>
+        <h3>一次寄出</h3>
+        <p>平台上门取件或快递寄送，批量提交多本也只寄一次，不用一本本等买家。</p>
+        <div class="step-foot">
+          <span>免费上门 / 包邮</span>
+          <span class="step-next">下一步：验收 →</span>
+        </div>
+      </article>
+
+      <article class="step-card reveal">
+        <span class="step-num">3</span>
+        <p class="step-kicker">Step 03</p>
+        <h3>验收打款</h3>
+        <p>平台验收品相，合格即 24 小时内打款；如有出入按透明规则议价，不强行扣留。</p>
+        <div class="step-foot">
+          <span>最快 24 小时到账</span>
+          <span class="step-next">完成 ✓</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 回收规则 ==================== -->
+<section class="section" id="rules">
+  <div class="container">
+    <div class="surface rules-card reveal">
+      <h3>回收规则 · 品相与定价</h3>
+      <div class="rules-grid">
+        <div class="rule-item">
+          <span class="rule-num">1</span>
+          <div>
+            <h5>品相等级与回收比例</h5>
+            <p>全新 / 九五新约定价的 75%–90%；九成新约 60%；八成新及以下约 40%。具体以扫码估价结果为准。</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-num">2</span>
+          <div>
+            <h5>哪些书可以回收</h5>
+            <p>正版图书、内容完整、无严重破损即可。教材教辅、文学小说、社科人文、考研考证类优先。</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-num">3</span>
+          <div>
+            <h5>哪些书不回收</h5>
+            <p>盗版、缺页严重、水泡发霉、图书馆馆藏（带馆藏章）、杂志期刊及无 ISBN 的印刷品。</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-num">4</span>
+          <div>
+            <h5>验收与打款</h5>
+            <p>平台收到书后 1–2 个工作日完成验收。品相与描述一致即打款；有出入会先与你确认，可退回。</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-num">5</span>
+          <div>
+            <h5>寄送方式</h5>
+            <p>支持免费上门取件（限校园与市区）或快递寄送（平台承担部分运费）。批量提交只寄一次。</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-num">6</span>
+          <div>
+            <h5>关于盗版与纠纷</h5>
+            <p>如发现盗版，平台有权拒收并退回。交易纠纷可通过客服与平台仲裁解决，全程有记录。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 提交弹层 ==================== -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+
+    <!-- 表单态 -->
+    <div id="modalForm">
+      <h3>提交回收订单</h3>
+      <p class="sub">确认寄送方式与联系方式，提交后平台会与你确认上门时间。</p>
+
+      <div class="modal-fields">
+        <div class="field">
+          <label>寄送方式</label>
+          <div class="ship-options" id="shipOptions">
+            <button class="ship-option selected" type="button" data-ship="pickup">
+              <span class="ship-icon"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></span>
+              <span class="ship-text">
+                <b>免费上门取件</b>
+                <span>限校园与市区，预约后 24 小时内上门</span>
+              </span>
+            </button>
+            <button class="ship-option" type="button" data-ship="express">
+              <span class="ship-icon"><svg viewBox="0 0 24 24"><path d="M3 7h13v10H3z"/><path d="M16 10h4l1 4v3h-5z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
+              <span class="ship-text">
+                <b>快递寄送</b>
+                <span>平台承担部分运费，寄出后填单号</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>联系方式</label>
+          <div class="row">
+            <input type="text" id="contactName" placeholder="姓名">
+            <input type="tel" id="contactPhone" placeholder="手机号">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>取件地址（选填）</label>
+          <input type="text" id="contactAddr" placeholder="如：XX大学 XX 宿舍楼">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" type="button" id="modalCancel">取消</button>
+        <button class="btn-primary" type="button" id="modalConfirm">确认提交</button>
+      </div>
+    </div>
+
+    <!-- 成功态 -->
+    <div id="modalSuccess" style="display:none;">
+      <div class="success">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></svg>
+        </div>
+        <h3>回收订单已提交</h3>
+        <p class="sub">
+          平台会尽快与你确认上门时间。<br>
+          验收合格后 <b>24 小时内打款</b>。
+        </p>
+        <div class="order-no">订单号：<b id="orderNo">—</b></div>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="backToSell">继续估价</button>
+          <button class="btn-primary" type="button" id="backHome">回首页</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ==================== Footer ==================== -->
+<div class="site-footer-wrap">
+  <footer class="site-footer container">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <a class="logo" href="index.html">
+          <span class="logo-mark">L</span>
+          <span class="logo-text">
+            <b>LUMEN</b>
+            <em>Books</em>
+          </span>
+        </a>
+        <p>大学生二手书流转平台 · 扫码卖书 · 按品相定价 · 担保交易。<br>让每一本旧书遇见下一位读者。</p>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <h5>Discover</h5>
+          <a href="lists.html">书单</a>
+          <a href="market.html">淘书</a>
+          <a href="reviews.html#wantedSection">寻书</a>
+          <a href="reviews.html">书话</a>
+        </div>
+        <div>
+          <h5>Service</h5>
+          <a href="sell.html">卖书</a>
+          <a href="sell.html#rules">回收规则</a>
+          <a href="#">交易担保</a>
+          <a href="#">售后仲裁</a>
+        </div>
+        <div>
+          <h5>About</h5>
+          <a href="#">平台规则</a>
+          <a href="#">联系我们</a>
+          <a href="#">使用条款</a>
+          <a href="#">隐私说明</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LUMEN BOOKS · 仅用于学习交流</span>
+      <span>Reading makes us meet.</span>
+    </div>
+  </footer>
+</div>
+
+<script src="store.js"></script>
+<script>
+/* ============================================================
+   估价用的书籍数据与 market / book / checkout 同源，
+   直接取 store.js 的 CATALOG（按 ISBN 索引），不再各页维护副本。
+   ============================================================ */
+const BOOK_DB = {
+  '9787508684031': Store.getBook('zhishenshizheng'),
+  '9787544270878': Store.getBook('bainiangudu'),
+  '9787020024759': Store.getBook('waerdeng')
+};
+
+/* ---------- 状态 ---------- */
+let current = null;      // { isbn, ...book, cond, rate, price }
+
+/* 回收清单：从 localStorage 恢复，刷新页面不丢 */
+let cart = [];
+try { cart = JSON.parse(localStorage.getItem('lumen_sell_cart') || '[]') || []; }
+catch (e) { cart = []; }
+let cartSeq = cart.length ? Math.max.apply(null, cart.map(i => i.id)) + 1 : 1;
+
+const SELL_CART_KEY = 'lumen_sell_cart';
+
+/* ---------- DOM ---------- */
+const isbnInput   = document.getElementById('isbnInput');
+const bookPreview = document.getElementById('bookPreview');
+const condWrap    = document.getElementById('condWrap');
+const estAmount   = document.getElementById('estAmount');
+const estMarket   = document.getElementById('estMarket');
+const estRate     = document.getElementById('estRate');
+const cartList    = document.getElementById('cartList');
+const cartEmpty   = document.getElementById('cartEmpty');
+const cartCount   = document.getElementById('cartCount');
+const cartTotal   = document.getElementById('cartTotal');
+const totalCount  = document.getElementById('totalCount');
+const totalSub    = document.getElementById('totalSub');
+const totalAmount = document.getElementById('totalAmount');
+const toastEl     = document.getElementById('toast');
+
+/* ---------- Toast ---------- */
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+/* ---------- 估价 ---------- */
+function estimate(isbnRaw){
+  const isbn = (isbnRaw || '').replace(/[^0-9Xx]/g, '');
+  if (!isbn) { toast('请输入 ISBN'); return; }
+
+  const book = BOOK_DB[isbn];
+
+  // 找不到 → 演示用占位书（真实产品应提示未收录）
+  const data = book || {
+    title: '未收录的书籍（演示）',
+    author: '未知作者',
+    pub: '演示数据 · ISBN ' + isbn,
+    listPrice: 50,
+    bg: '#111111'
+  };
+
+  const rate = parseFloat(document.querySelector('.cond-option.selected').dataset.rate);
+  const price = Math.max(1, Math.round(data.listPrice * rate));
+
+  current = {
+    isbn,
+    ...data,
+    cond: document.querySelector('.cond-option.selected').dataset.cond,
+    condName: document.querySelector('.cond-option.selected .cond-name').textContent,
+    rate,
+    price
+  };
+
+  renderPreview();
+  updateEstimate();
+  condWrap.style.display = '';
+}
+
+function renderPreview(){
+  if (!current) {
+    bookPreview.classList.add('empty');
+    bookPreview.innerHTML = `
+      <div class="ph-cover"></div>
+      <h4>还没有估价的书</h4>
+      <p>输入 ISBN 或扫码后，<br>这里会显示书籍信息与回收价。</p>
+    `;
+    return;
+  }
+  bookPreview.classList.remove('empty');
+  bookPreview.innerHTML = `
+    <div class="preview-inner">
+      <span class="preview-cover" style="--book-bg:${current.bg};${current.cover ? `background-image:url('${current.cover}');` : ''}"></span>
+      <div class="preview-meta">
+        <h4>${current.title}</h4>
+        <p class="author">${current.author}</p>
+        <p class="pub">${current.pub}</p>
+        <span class="isbn-tag">ISBN ${current.isbn}</span>
+      </div>
+    </div>
+  `;
+}
+
+function updateEstimate(){
+  if (!current) return;
+  const rate = parseFloat(document.querySelector('.cond-option.selected').dataset.rate);
+  const price = Math.max(1, Math.round(current.listPrice * rate));
+  current.rate = rate;
+  current.price = price;
+  current.condName = document.querySelector('.cond-option.selected .cond-name').textContent;
+  current.cond = document.querySelector('.cond-option.selected').dataset.cond;
+
+  estAmount.innerHTML = '<small>¥</small>' + price;
+  estMarket.textContent = '¥' + current.listPrice;
+  estRate.textContent = Math.round(rate * 100) + '%';
+}
+
+/* ---------- 品相切换 ---------- */
+document.getElementById('condOptions').addEventListener('click', (e) => {
+  const btn = e.target.closest('.cond-option');
+  if (!btn) return;
+  document.querySelectorAll('.cond-option').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateEstimate();
+});
+
+/* ---------- 清空重输 ---------- */
+document.getElementById('clearBtn').addEventListener('click', () => {
+  current = null;
+  isbnInput.value = '';
+  condWrap.style.display = 'none';
+  renderPreview();
+  isbnInput.focus();
+});
+
+/* ---------- 扫码（演示：自动填入一个 ISBN 并估价） ---------- */
+document.getElementById('scanBtn').addEventListener('click', () => {
+  const isbns = Object.keys(BOOK_DB);
+  const pick = isbns[Math.floor(Math.random() * isbns.length)];
+  isbnInput.value = pick;
+  toast('已扫描到 ISBN：' + pick);
+  estimate(pick);
+});
+
+/* ---------- 加入回收清单 ---------- */
+document.getElementById('addBtn').addEventListener('click', () => {
+  if (!current) { toast('请先估价'); return; }
+
+  cart.push({
+    id: cartSeq++,
+    title: current.title,
+    author: current.author,
+    pub: current.pub,
+    bg: current.bg,
+    cover: current.cover,
+    cond: current.cond,
+    condName: current.condName,
+    price: current.price,
+    listPrice: current.listPrice
+  });
+
+  renderCart();
+  toast('已加入回收清单');
+
+  // 清空当前，方便继续扫下一本
+  current = null;
+  isbnInput.value = '';
+  condWrap.style.display = 'none';
+  renderPreview();
+  isbnInput.focus();
+});
+
+/* ---------- 渲染回收清单 ---------- */
+function renderCart(){
+  /* 每次渲染后写回 localStorage，刷新页面清单还在 */
+  try { localStorage.setItem(SELL_CART_KEY, JSON.stringify(cart)); } catch (e) {}
+
+  cartCount.textContent = cart.length + ' 本';
+
+  if (cart.length === 0) {
+    cartList.innerHTML = `
+      <div class="cart-empty">
+        <b>清单还是空的。</b><br>
+        左侧扫码估价后，点击「加入回收清单」。
+      </div>
+    `;
+    cartTotal.style.display = 'none';
+    return;
+  }
+
+  cartList.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <span class="cover-sm" style="--book-bg:${item.bg};${item.cover ? `background-image:url('${item.cover}');` : ''}"></span>
+      <div class="info">
+        <h5>${item.title}</h5>
+        <div class="meta">
+          <span>${item.author}</span>
+          <span class="cond-tag">${item.condName}</span>
+        </div>
+      </div>
+      <div class="cart-right">
+        <div class="col">
+          <span class="price"><small>¥</small>${item.price}</span>
+        </div>
+        <button class="remove" data-id="${item.id}" aria-label="移除">×</button>
+      </div>
+    </div>
+  `).join('');
+
+  // 合计
+  const total = cart.reduce((s, i) => s + i.price, 0);
+  totalCount.textContent = cart.length + ' 本';
+  totalSub.textContent = '¥' + total;
+  totalAmount.innerHTML = '<small>¥</small>' + total;
+  cartTotal.style.display = '';
+
+  // 绑定删除
+  cartList.querySelectorAll('.remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.id, 10);
+      cart = cart.filter(i => i.id !== id);
+      renderCart();
+      toast('已移除');
+    });
+  });
+}
+
+/* ---------- 清空清单 ---------- */
+document.getElementById('clearCartBtn').addEventListener('click', () => {
+  if (cart.length === 0) return;
+  cart = [];
+  renderCart();
+  toast('清单已清空');
+});
+
+/* ---------- 提交弹层 ---------- */
+const overlay = document.getElementById('overlay');
+const modalForm = document.getElementById('modalForm');
+const modalSuccess = document.getElementById('modalSuccess');
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  if (cart.length === 0) { toast('清单为空'); return; }
+  modalForm.style.display = '';
+  modalSuccess.style.display = 'none';
+  overlay.classList.add('show');
+});
+
+document.getElementById('modalCancel').addEventListener('click', () => {
+  overlay.classList.remove('show');
+});
+
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) overlay.classList.remove('show');
+});
+
+document.getElementById('shipOptions').addEventListener('click', (e) => {
+  const btn = e.target.closest('.ship-option');
+  if (!btn) return;
+  document.querySelectorAll('.ship-option').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+});
+
+document.getElementById('modalConfirm').addEventListener('click', () => {
+  const name = document.getElementById('contactName').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+
+  if (!name) { toast('请填写姓名'); return; }
+  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('请填写正确的手机号'); return; }
+
+  // 生成订单号
+  const now = new Date();
+  const no = 'LM' + now.getFullYear() +
+             String(now.getMonth() + 1).padStart(2, '0') +
+             String(now.getDate()).padStart(2, '0') +
+             String(Math.floor(Math.random() * 9000) + 1000);
+
+  document.getElementById('orderNo').textContent = no;
+  modalForm.style.display = 'none';
+  modalSuccess.style.display = '';
+
+  // 提交后清空清单（含本地存档）
+  cart = [];
+  try { localStorage.removeItem(SELL_CART_KEY); } catch (e) {}
+  renderCart();
+});
+
+document.getElementById('backToSell').addEventListener('click', () => {
+  overlay.classList.remove('show');
+  isbnInput.focus();
+});
+
+document.getElementById('backHome').addEventListener('click', () => {
+  location.href = 'index.html';
+});
+
+/* ---------- 表单提交（回车触发估价） ---------- */
+document.getElementById('isbnForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  estimate(isbnInput.value);
+});
+
+/* ---------- 进入页面：恢复上次未提交的回收清单 ---------- */
+renderCart();
+
+/* ---------- Reveal on scroll ---------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = (i % 3) * 80 + 'ms';
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+<script src="auth.js"></script>
+<script src="nav-ball.js" defer></script>
+<!-- 方案 B · 一页之间：书签绸带 + 跨页刊头 -->
+<script src="spread.js"></script>  <script src="pt.js" defer></script>
+</body>
+</html>
